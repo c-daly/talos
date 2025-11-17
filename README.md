@@ -37,6 +37,52 @@ talos/
 
 ## Installation
 
+### Prerequisites
+
+- Python 3.11 or higher
+- Poetry (recommended) or pip
+
+### Installing with Poetry (Recommended)
+
+Poetry provides better dependency management and reproducible builds.
+
+1. **Install Poetry** (if not already installed):
+   ```bash
+   # Via pip
+   pip install poetry
+   
+   # Or via the official installer (recommended)
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+
+2. **Clone the repository**:
+   ```bash
+   git clone https://github.com/c-daly/talos.git
+   cd talos
+   ```
+
+3. **Install dependencies**:
+   ```bash
+   # Install all dependencies (including dev dependencies)
+   poetry install
+   
+   # Or install only production dependencies
+   poetry install --without dev
+   ```
+
+4. **Activate the virtual environment**:
+   ```bash
+   # Option 1: Spawn a shell within the virtual environment
+   poetry shell
+   
+   # Option 2: Run commands with 'poetry run'
+   poetry run python examples/sensor_example.py
+   ```
+
+### Installing with pip
+
+If you prefer using pip:
+
 ```bash
 # Clone the repository
 git clone https://github.com/c-daly/talos.git
@@ -101,12 +147,25 @@ scenario.release_object()
 
 ### Running Tests
 
+With Poetry:
+```bash
+poetry run pytest
+```
+
+With pip:
 ```bash
 pytest
 ```
 
 ### Code Formatting
 
+With Poetry:
+```bash
+poetry run black src/ tests/
+poetry run ruff check src/ tests/
+```
+
+With pip:
 ```bash
 black src/ tests/
 ruff check src/ tests/
@@ -114,8 +173,35 @@ ruff check src/ tests/
 
 ### Type Checking
 
+With Poetry:
+```bash
+poetry run mypy src/
+```
+
+With pip:
 ```bash
 mypy src/
+```
+
+### Adding Dependencies
+
+To add a new dependency with Poetry:
+```bash
+# Production dependency
+poetry add package-name
+
+# Development dependency
+poetry add --group dev package-name
+```
+
+### Updating Dependencies
+
+```bash
+# Update all dependencies
+poetry update
+
+# Update a specific package
+poetry update package-name
 ```
 
 ## Phase 1 Deliverables
