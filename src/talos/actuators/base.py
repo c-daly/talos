@@ -42,7 +42,7 @@ class Actuator(ABC):
         Returns:
             Dictionary containing actuator state
         """
-        pass
+        pass  # pragma: no cover
 
     def get_info(self) -> Dict[str, Any]:
         """Get actuator information.

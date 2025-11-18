@@ -42,7 +42,7 @@ try:
         "mock_robot_arm",
         "mock_sensor_suite",
     ]
-except ImportError:
+except ImportError:  # pragma: no cover
     # pytest not available, fixtures not imported
     __all__ = [
         "Sensor",

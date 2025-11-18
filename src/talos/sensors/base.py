@@ -26,7 +26,7 @@ class Sensor(ABC):
         Returns:
             Sensor-specific data format
         """
-        pass
+        pass  # pragma: no cover
 
     def enable(self) -> None:
         """Enable the sensor."""
