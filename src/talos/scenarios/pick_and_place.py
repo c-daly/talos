@@ -101,7 +101,9 @@ class PickAndPlaceScenario:
         if object_name not in self.objects:
             return False
 
-        target_pos = cast(npt.NDArray[np.float64], self.objects[object_name]["position"])
+        target_pos = cast(
+            npt.NDArray[np.float64], self.objects[object_name]["position"]
+        )
         self.end_effector_position = target_pos.copy()
 
         # Update joint positions (simplified kinematics)
