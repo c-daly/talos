@@ -1,7 +1,8 @@
 """Simulated motor actuator."""
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from talos.actuators.base import Actuator
+from talos.telemetry import TelemetryRecorder, EventType
 
 
 class SimulatedMotor(Actuator):
@@ -16,6 +17,7 @@ class SimulatedMotor(Actuator):
         min_position: float = -3.14,
         max_position: float = 3.14,
         max_velocity: float = 1.0,
+        telemetry: Optional[TelemetryRecorder] = None,
     ) -> None:
         """Initialize simulated motor.
 
@@ -24,6 +26,7 @@ class SimulatedMotor(Actuator):
             min_position: Minimum position in radians
             max_position: Maximum position in radians
             max_velocity: Maximum velocity in rad/s
+            telemetry: Optional telemetry recorder for tracking events
         """
         super().__init__(name)
         self.min_position = min_position
@@ -32,6 +35,7 @@ class SimulatedMotor(Actuator):
         self._position = 0.0
         self._velocity = 0.0
         self._target_position = 0.0
+        self.telemetry = telemetry or TelemetryRecorder()
 
     def set_position(self, position: float) -> None:
         """Set target position for the motor.
@@ -43,11 +47,22 @@ class SimulatedMotor(Actuator):
             raise RuntimeError(f"Actuator {self.name} is disabled")
 
         # Clamp to valid range
-        position = max(self.min_position, min(self.max_position, position))
-        self._target_position = position
+        clamped_position = max(self.min_position, min(self.max_position, position))
+        self._target_position = clamped_position
+
+        # Record telemetry
+        self.telemetry.record_event(
+            EventType.POSITION_SET,
+            self.name,
+            {
+                "requested_position": position,
+                "clamped_position": clamped_position,
+                "previous_position": self._position,
+            },
+        )
 
         # Simulate instant movement for now (Phase 1 simplification)
-        self._position = position
+        self._position = clamped_position
         self._velocity = 0.0
 
     def set_velocity(self, velocity: float) -> None:
@@ -60,8 +75,20 @@ class SimulatedMotor(Actuator):
             raise RuntimeError(f"Actuator {self.name} is disabled")
 
         # Clamp to valid range
-        velocity = max(-self.max_velocity, min(self.max_velocity, velocity))
-        self._velocity = velocity
+        clamped_velocity = max(-self.max_velocity, min(self.max_velocity, velocity))
+
+        # Record telemetry
+        self.telemetry.record_event(
+            EventType.VELOCITY_SET,
+            self.name,
+            {
+                "requested_velocity": velocity,
+                "clamped_velocity": clamped_velocity,
+                "previous_velocity": self._velocity,
+            },
+        )
+
+        self._velocity = clamped_velocity
 
     def get_position(self) -> float:
         """Get current motor position.

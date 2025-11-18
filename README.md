@@ -125,6 +125,32 @@ gripper.open()
 gripper.close()
 ```
 
+### Using Telemetry
+
+```python
+from talos.actuators import SimulatedMotor, SimulatedGripper
+from talos.telemetry import TelemetryRecorder, EventType
+
+# Create shared telemetry recorder
+telemetry = TelemetryRecorder(max_events=1000)
+
+# Create actuators with telemetry
+motor = SimulatedMotor(name="arm_joint_1", telemetry=telemetry)
+gripper = SimulatedGripper(name="gripper", telemetry=telemetry)
+
+# Perform operations
+motor.set_position(1.57)
+gripper.close()
+gripper.grasp("cup")
+
+# Query telemetry
+events = telemetry.get_events(actuator_name="gripper")
+position_events = telemetry.get_events(event_type=EventType.POSITION_SET)
+
+# Export telemetry data
+telemetry_data = telemetry.to_dict()
+```
+
 ### Pick and Place Scenario
 
 ```python
@@ -141,6 +167,9 @@ scenario.move_to_object("cup")
 scenario.grasp_object("cup")
 scenario.move_to_location("table")
 scenario.release_object()
+
+# Access telemetry
+telemetry_events = scenario.telemetry.get_events()
 ```
 
 ## Development

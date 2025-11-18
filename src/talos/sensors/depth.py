@@ -2,6 +2,7 @@
 
 from typing import Tuple
 import numpy as np
+import numpy.typing as npt
 from talos.sensors.base import Sensor
 
 
@@ -32,7 +33,7 @@ class SimulatedDepth(Sensor):
         self.max_range = max_range
         self._frame_count = 0
 
-    def read(self) -> np.ndarray:
+    def read(self) -> npt.NDArray[np.float32]:
         """Read current depth map.
 
         Returns:
@@ -68,7 +69,8 @@ class SimulatedDepth(Sensor):
         depth_map = depth_map + time_offset
 
         self._frame_count += 1
-        return depth_map.astype(np.float32)
+        result: npt.NDArray[np.float32] = depth_map.astype(np.float32)
+        return result
 
     def get_info(self) -> dict:
         """Get depth sensor information.

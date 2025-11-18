@@ -1,9 +1,11 @@
 """Pick and place scenario simulation."""
 
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, cast
 import numpy as np
+import numpy.typing as npt
 from talos.sensors import SimulatedCamera, SimulatedDepth, SimulatedIMU
 from talos.actuators import SimulatedMotor, SimulatedGripper
+from talos.telemetry import TelemetryRecorder
 
 
 class PickAndPlaceScenario:
@@ -15,22 +17,34 @@ class PickAndPlaceScenario:
 
     def __init__(self) -> None:
         """Initialize pick and place scenario."""
+        # Create shared telemetry recorder for all actuators
+        self.telemetry = TelemetryRecorder(max_events=5000)
+
         # Create sensors
         self.camera = SimulatedCamera(name="arm_camera")
         self.depth = SimulatedDepth(name="arm_depth")
         self.imu = SimulatedIMU(name="arm_imu")
 
-        # Create actuators (simple 3-joint arm + gripper)
+        # Create actuators (simple 3-joint arm + gripper) with shared telemetry
         self.joint1 = SimulatedMotor(
-            name="joint1", min_position=-1.57, max_position=1.57
+            name="joint1",
+            min_position=-1.57,
+            max_position=1.57,
+            telemetry=self.telemetry,
         )
         self.joint2 = SimulatedMotor(
-            name="joint2", min_position=-1.57, max_position=1.57
+            name="joint2",
+            min_position=-1.57,
+            max_position=1.57,
+            telemetry=self.telemetry,
         )
         self.joint3 = SimulatedMotor(
-            name="joint3", min_position=-1.57, max_position=1.57
+            name="joint3",
+            min_position=-1.57,
+            max_position=1.57,
+            telemetry=self.telemetry,
         )
-        self.gripper = SimulatedGripper(name="gripper")
+        self.gripper = SimulatedGripper(name="gripper", telemetry=self.telemetry)
 
         # Define objects in the scene
         self.objects = {
@@ -65,13 +79,14 @@ class PickAndPlaceScenario:
             "gripper_state": self.gripper.get_state(),
             "objects": {
                 name: {
-                    "position": obj["position"].tolist(),
+                    "position": cast(npt.NDArray[np.float64], obj["position"]).tolist(),
                     "grasped": obj["grasped"],
                 }
                 for name, obj in self.objects.items()
             },
             "locations": {name: pos.tolist() for name, pos in self.locations.items()},
             "action_history": self.action_history,
+            "telemetry_event_count": self.telemetry.get_event_count(),
         }
 
     def move_to_object(self, object_name: str) -> bool:
@@ -86,12 +101,12 @@ class PickAndPlaceScenario:
         if object_name not in self.objects:
             return False
 
-        target_pos = self.objects[object_name]["position"]
+        target_pos = cast(npt.NDArray[np.float64], self.objects[object_name]["position"])
         self.end_effector_position = target_pos.copy()
 
         # Update joint positions (simplified kinematics)
-        self.joint1.set_position(np.arctan2(target_pos[1], target_pos[0]))
-        self.joint2.set_position(target_pos[2] / 0.3)
+        self.joint1.set_position(float(np.arctan2(target_pos[1], target_pos[0])))
+        self.joint2.set_position(float(target_pos[2] / 0.3))
         self.joint3.set_position(0.0)
 
         self.action_history.append(f"move_to_object({object_name})")
@@ -113,8 +128,8 @@ class PickAndPlaceScenario:
         self.end_effector_position = target_pos.copy()
 
         # Update joint positions (simplified kinematics)
-        self.joint1.set_position(np.arctan2(target_pos[1], target_pos[0]))
-        self.joint2.set_position(target_pos[2] / 0.3)
+        self.joint1.set_position(float(np.arctan2(target_pos[1], target_pos[0])))
+        self.joint2.set_position(float(target_pos[2] / 0.3))
         self.joint3.set_position(0.0)
 
         # If holding an object, move it too
@@ -140,7 +155,8 @@ class PickAndPlaceScenario:
         obj = self.objects[object_name]
 
         # Check if end effector is close enough
-        distance = np.linalg.norm(self.end_effector_position - obj["position"])
+        obj_pos = cast(npt.NDArray[np.float64], obj["position"])
+        distance = float(np.linalg.norm(self.end_effector_position - obj_pos))
         if distance > 0.05:  # 5cm threshold
             return False
 
@@ -190,6 +206,9 @@ class PickAndPlaceScenario:
         # Clear history
         self.action_history = []
 
+        # Clear telemetry
+        self.telemetry.clear()
+
     def execute_pick_and_place(
         self, object_name: str, target_location: str
     ) -> Tuple[bool, List[str]]:
@@ -202,7 +221,7 @@ class PickAndPlaceScenario:
         Returns:
             Tuple of (success, action_log)
         """
-        actions = []
+        actions: List[str] = []
 
         # Move to object
         if not self.move_to_object(object_name):
