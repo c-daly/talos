@@ -174,16 +174,91 @@ telemetry_events = scenario.telemetry.get_events()
 
 ## Development
 
+### Installing for Development
+
+To set up Talos for development, you need to install it in editable mode along with development dependencies.
+
+#### With Poetry (Recommended)
+
+Poetry automatically handles editable installs and development dependencies:
+
+```bash
+# Install all dependencies including dev dependencies
+poetry install --with dev
+
+# Or if you already have the main dependencies:
+poetry install
+
+# Activate the virtual environment
+poetry shell
+```
+
+#### With pip
+
+When using pip, you need to explicitly install in editable mode:
+
+```bash
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
+
+# This installs the package in development mode, allowing you to
+# modify the source code without reinstalling
+```
+
+**Important**: If you don't install in editable mode (using `-e` flag or `poetry install`), you'll need to set the `PYTHONPATH` environment variable to use the local source code:
+
+```bash
+# Only needed if NOT installed in editable mode
+export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+
+# Or for a single command:
+PYTHONPATH=src pytest
+```
+
 ### Running Tests
+
+#### Basic Test Execution
 
 With Poetry:
 ```bash
 poetry run pytest
 ```
 
-With pip:
+With pip (after editable install):
 ```bash
 pytest
+```
+
+#### Running Tests with Coverage
+
+To run tests with coverage reporting:
+
+```bash
+# With Poetry
+poetry run pytest --cov=talos --cov-report=term-missing
+
+# With pip
+pytest --cov=talos --cov-report=term-missing
+```
+
+#### Coverage Requirements
+
+This project enforces a minimum coverage threshold of **95%**. The CI pipeline will fail if coverage drops below this threshold.
+
+To check coverage and fail if below threshold:
+
+```bash
+# With Poetry
+poetry run pytest --cov=talos --cov-report=term-missing --cov-fail-under=95
+
+# With pip
+pytest --cov=talos --cov-report=term-missing --cov-fail-under=95
+```
+
+To generate an XML coverage report (used by Codecov):
+
+```bash
+pytest --cov=talos --cov-report=xml
 ```
 
 ### Code Formatting
@@ -211,6 +286,36 @@ With pip:
 ```bash
 mypy src/
 ```
+
+### Running All Checks
+
+To run all quality checks (linting, formatting, type checking, and tests):
+
+```bash
+# With Poetry
+poetry run ruff check src/ tests/
+poetry run black --check src/ tests/
+poetry run mypy src/
+poetry run pytest --cov=talos --cov-report=term-missing --cov-fail-under=95
+
+# With pip
+ruff check src/ tests/
+black --check src/ tests/
+mypy src/
+pytest --cov=talos --cov-report=term-missing --cov-fail-under=95
+```
+
+### Continuous Integration
+
+This project uses GitHub Actions for CI/CD. On every pull request and push to `main`, the following checks are run:
+
+- **Linting**: `ruff check src/ tests/`
+- **Formatting**: `black --check src/ tests/`
+- **Type Checking**: `mypy src/`
+- **Tests with Coverage**: `pytest --cov=talos --cov-report=xml --cov-fail-under=95`
+- **Coverage Upload**: Results are uploaded to Codecov
+
+All checks must pass before code can be merged.
 
 ### Adding Dependencies
 

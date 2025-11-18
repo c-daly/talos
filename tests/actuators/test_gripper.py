@@ -108,3 +108,23 @@ def test_gripper_get_state() -> None:
     assert state["opening"] == 0.0
     assert state["is_grasping"] is True
     assert state["grasped_object"] == "cup"
+
+
+def test_gripper_get_info() -> None:
+    """Test gripper info retrieval."""
+    gripper = SimulatedGripper(name="test_gripper", max_opening=0.1)
+
+    info = gripper.get_info()
+    assert info["name"] == "test_gripper"
+    assert info["type"] == "SimulatedGripper"
+    assert info["enabled"] is True
+    assert info["max_opening"] == 0.1
+
+
+def test_gripper_disabled_release() -> None:
+    """Test that disabled gripper raises error on release."""
+    gripper = SimulatedGripper()
+    gripper.disable()
+
+    with pytest.raises(RuntimeError, match="disabled"):
+        gripper.release()

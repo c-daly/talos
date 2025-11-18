@@ -81,3 +81,21 @@ def test_motor_get_state() -> None:
     assert state["position"] == 1.0
     assert state["target_position"] == 1.0
     assert "velocity" in state
+
+
+def test_motor_get_info() -> None:
+    """Test motor info retrieval."""
+    motor = SimulatedMotor(
+        name="test_motor",
+        min_position=-2.0,
+        max_position=2.0,
+        max_velocity=1.5,
+    )
+
+    info = motor.get_info()
+    assert info["name"] == "test_motor"
+    assert info["type"] == "SimulatedMotor"
+    assert info["enabled"] is True
+    assert info["min_position"] == -2.0
+    assert info["max_position"] == 2.0
+    assert info["max_velocity"] == 1.5

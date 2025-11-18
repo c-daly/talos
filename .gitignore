@@ -42,6 +42,7 @@ poetry.toml
 .coverage
 htmlcov/
 .tox/
+coverage.xml
 
 # Type checking
 .mypy_cache/
