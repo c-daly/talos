@@ -4,6 +4,7 @@ __version__ = "0.1.0"
 
 from talos.sensors import Sensor, SimulatedCamera, SimulatedDepth, SimulatedIMU
 from talos.actuators import Actuator, SimulatedMotor, SimulatedGripper
+from talos.telemetry import TelemetryRecorder, TelemetryEvent, EventType
 
 __all__ = [
     "Sensor",
@@ -13,4 +14,7 @@ __all__ = [
     "Actuator",
     "SimulatedMotor",
     "SimulatedGripper",
+    "TelemetryRecorder",
+    "TelemetryEvent",
+    "EventType",
 ]
