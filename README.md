@@ -233,6 +233,50 @@ poetry update
 poetry update package-name
 ```
 
+## Testing with Mock Hardware Fixtures
+
+Talos provides pytest fixtures for easy testing of robotic scenarios. These fixtures are designed to be consumed by Sophia's test harness and other testing frameworks.
+
+### Available Fixtures
+
+- `mock_camera` - Simulated camera sensor
+- `mock_depth_sensor` - Simulated depth sensor
+- `mock_imu` - Simulated IMU
+- `mock_motor` - Simulated motor actuator
+- `mock_gripper` - Simulated gripper actuator
+- `mock_telemetry` - Telemetry recorder for tracking operations
+- `mock_pick_and_place` - Complete pick-and-place scenario
+- `mock_robot_arm` - Multi-joint robot arm (3 joints)
+- `mock_sensor_suite` - Complete suite of sensors
+
+### Using Fixtures in Tests
+
+Add this to your `conftest.py`:
+
+```python
+pytest_plugins = ["talos.fixtures"]
+```
+
+Then use fixtures in your tests:
+
+```python
+def test_robot_operation(mock_pick_and_place):
+    """Test a pick and place operation."""
+    scenario = mock_pick_and_place
+    
+    # Execute operation
+    success, actions = scenario.execute_pick_and_place("cup", "shelf")
+    
+    assert success
+    assert len(actions) == 4
+    
+    # Access telemetry
+    events = scenario.telemetry.get_events()
+    assert len(events) > 0
+```
+
+See `examples/fixtures_example.py` for more examples.
+
 ## Phase 1 Deliverables
 
 - [x] Python project structure
@@ -246,6 +290,7 @@ poetry update package-name
 - [x] Pick and place scenario simulation
 - [x] Unit tests
 - [x] Integration tests
+- [x] Mock hardware fixtures for testing
 
 ## Related Repositories
 
