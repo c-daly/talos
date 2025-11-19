@@ -283,6 +283,27 @@ poetry run pytest --cov=talos --cov-report=term-missing
 pytest --cov=talos --cov-report=term-missing
 ```
 
+#### Integration Tests
+
+Talos includes integration tests for external services like Milvus (vector database) and Neo4j. These tests validate:
+
+- Milvus collection initialization and configuration
+- Embedding storage and retrieval via sync utilities (simulating Hermes)
+- Metadata/UUID verification in Neo4j
+- Health checks and collection count assertions
+
+Integration tests are designed to skip gracefully when external services are unavailable, with clear messages explaining why they were skipped. Run all tests including integration tests with:
+
+```bash
+pytest tests/
+```
+
+Or run only integration tests:
+
+```bash
+pytest tests/integration/
+```
+
 #### Coverage Requirements
 
 This project enforces a minimum coverage threshold of **95%**. The CI pipeline will fail if coverage drops below this threshold.
@@ -437,6 +458,7 @@ See `examples/fixtures_example.py` for more examples.
 - [x] Pick and place scenario simulation
 - [x] Unit tests
 - [x] Integration tests
+- [x] Milvus embedding integration smoke test
 - [x] Mock hardware fixtures for testing
 - [x] Executor shim for M4 integration (Talos/Executor loop simulation)
 
