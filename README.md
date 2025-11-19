@@ -31,8 +31,10 @@ talos/
 │   ├── base.py       # Actuator base class
 │   ├── motor.py      # Simulated motor
 │   └── gripper.py    # Simulated gripper
-└── scenarios/        # Pre-configured scenarios
-    └── pick_and_place.py  # Pick and place simulation
+├── scenarios/        # Pre-configured scenarios
+│   └── pick_and_place.py  # Pick and place simulation
+└── executor/         # Executor shim for Sophia integration
+    └── shim.py       # Minimal executor that applies plan steps to Neo4j
 ```
 
 ## Installation
@@ -171,6 +173,46 @@ scenario.release_object()
 # Access telemetry
 telemetry_events = scenario.telemetry.get_events()
 ```
+
+### Executor Shim (M4 Integration)
+
+The executor shim simulates the Talos/Executor loop by consuming plan nodes and applying state changes to Neo4j, representing Talos action feedback:
+
+```python
+from talos.executor import ExecutorShim, PlanNode, ActionType
+
+# Create executor shim (requires Neo4j)
+with ExecutorShim(
+    uri="bolt://localhost:7687",
+    username="neo4j",
+    password="password"
+) as executor:
+    # Execute a grasp action
+    grasp_node = PlanNode(
+        node_id="plan_001",
+        action_type=ActionType.GRASP,
+        target="cup"
+    )
+    result = executor.execute_plan_node(grasp_node)
+    
+    # Query object state
+    state = executor.get_object_state("cup")
+    print(f"Cup grasped: {state['grasped']}")
+    
+    # Execute a move action
+    move_node = PlanNode(
+        node_id="plan_002",
+        action_type=ActionType.MOVE_TO,
+        target="shelf",
+        parameters={"position": [0.3, 0.2, 0.3]}
+    )
+    executor.execute_plan_node(move_node)
+    
+    # Query robot location
+    location = executor.get_robot_location()
+```
+
+See `examples/executor_example.py` for a complete example and `tests/scenarios/test_m4_executor_loop.py` for tests using a mock Neo4j driver.
 
 ## Development
 
@@ -396,6 +438,7 @@ See `examples/fixtures_example.py` for more examples.
 - [x] Unit tests
 - [x] Integration tests
 - [x] Mock hardware fixtures for testing
+- [x] Executor shim for M4 integration (Talos/Executor loop simulation)
 
 ## Related Repositories
 
