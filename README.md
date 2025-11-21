@@ -99,7 +99,7 @@ pip install -e ".[dev]"
 Talos also consumes the shared LOGOS workflow template. Mirror the GitHub Actions job locally with:
 
 ```bash
-poetry install --with dev
+poetry install --extras dev
 poetry run ruff check src tests
 poetry run black --check src tests
 poetry run mypy src
@@ -240,7 +240,7 @@ Poetry automatically handles editable installs and development dependencies:
 
 ```bash
 # Install all dependencies including dev dependencies
-poetry install --with dev
+poetry install --extras dev
 
 # Or if you already have the main dependencies:
 poetry install
