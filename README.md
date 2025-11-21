@@ -94,6 +94,20 @@ cd talos
 pip install -e ".[dev]"
 ```
 
+## Local Testing (CI Parity)
+
+Talos also consumes the shared LOGOS workflow template. Mirror the GitHub Actions job locally with:
+
+```bash
+poetry install --with dev
+poetry run ruff check src tests
+poetry run black --check src tests
+poetry run mypy src
+poetry run pytest --cov=talos --cov-report=term-missing --cov-report=xml --cov-fail-under=95
+```
+
+Running these commands before opening a pull request ensures parity with `.github/workflows/ci.yml`.
+
 ## Quick Start
 
 ### Using Simulated Sensors

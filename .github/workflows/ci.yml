@@ -6,47 +6,20 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12"]
+permissions:
+  contents: read
 
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev]"
-        pip install pytest pytest-cov black ruff mypy
-    
-    - name: Lint with ruff
-      run: |
-        ruff check src/ tests/
-    
-    - name: Check formatting with black
-      run: |
-        black --check src/ tests/
-    
-    - name: Type check with mypy
-      run: |
-        mypy src/
-    
-    - name: Run tests with coverage
-      run: |
-        pytest --cov=talos --cov-report=xml --cov-report=term-missing --cov-fail-under=95
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: false
-        token: ${{ secrets.CODECOV_TOKEN }}
-      if: matrix.python-version == '3.12'
+jobs:
+  standard:
+    uses: c-daly/logos/.github/workflows/reusable-standard-ci.yml@main
+    with:
+      python_versions: '["3.11","3.12"]'
+      python_package_manager: 'poetry'
+      python_command_prefix: 'poetry run '
+      poetry_install_args: '--with dev'
+      python_lint_paths: 'src tests'
+      mypy_targets: 'src'
+      pytest_command: 'pytest --cov=talos --cov-report=term-missing --cov-report=xml --cov-fail-under=95'
+      coverage_python_version: '3.12'
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

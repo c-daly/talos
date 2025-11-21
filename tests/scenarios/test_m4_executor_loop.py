@@ -99,9 +99,9 @@ class MockNeo4jResult:
                         self.driver.nodes[node_key]["last_action"] = self.params.get(
                             "action_type"
                         )
-                        self.driver.nodes[node_key]["last_action_node"] = (
-                            self.params.get("node_id")
-                        )
+                        self.driver.nodes[node_key][
+                            "last_action_node"
+                        ] = self.params.get("node_id")
 
         elif "MERGE (loc:Location" in self.query:
             # Handle location operations
