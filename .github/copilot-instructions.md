@@ -21,7 +21,7 @@ Integration & patterns
 
 GitHub, tickets & PRs
 - Follow the workspace-wide rules in `logos/.github/copilot-instructions.md` for issues, labels, branch naming, and PR requirements. PRs that change simulated hardware interfaces must include example runs documented in `examples/`.
-- When you pick up an issue on the LOGOS workspace project, move its card to *In Progress* (and update the `status/*` label). Move it to *Done* when the work lands so the shared project board stays accurate.
+- When you pick up an issue on the LOGOS workspace project, move its card to *In Progress* (and update the `status/*` label). Once a PR is open and waiting for review/merge, move it to *PR awaiting merge*. Move it to *Done* when the work lands so the shared project board stays accurate.
 
 Examples
 - Add a new simulator: place it under `examples/`, add unit tests, document CLI/start flags in `README.md`, and include a manual test step in the PR description.
