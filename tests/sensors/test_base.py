@@ -6,7 +6,7 @@ from talos.sensors.base import Sensor
 class ConcreteSensor(Sensor):
     """Concrete sensor implementation for testing."""
 
-    def read(self):
+    def read(self) -> str:
         return "test_data"
 
 

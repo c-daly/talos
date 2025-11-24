@@ -1,10 +1,8 @@
 """Tests for scenario composition and complex multi-step operations."""
 
-import pytest
 from typing import List, Dict, Any
 
 from talos.scenarios.pick_and_place import PickAndPlaceScenario
-from talos.telemetry import EventType
 
 
 def test_chaining_multiple_pick_and_place_operations() -> None:
@@ -253,9 +251,8 @@ def test_scenario_state_snapshot() -> None:
     assert len(snapshots) == 5
     for i in range(len(snapshots) - 1):
         # Each snapshot should have more actions than the previous
-        assert (
-            len(snapshots[i + 1]["action_history"])
-            >= len(snapshots[i]["action_history"])
+        assert len(snapshots[i + 1]["action_history"]) >= len(
+            snapshots[i]["action_history"]
         )
 
 

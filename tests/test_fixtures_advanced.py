@@ -3,18 +3,6 @@
 import pytest
 from typing import Any
 
-from talos.fixtures import (
-    mock_camera,
-    mock_depth_sensor,
-    mock_imu,
-    mock_motor,
-    mock_gripper,
-    mock_telemetry,
-    mock_pick_and_place,
-    mock_robot_arm,
-    mock_sensor_suite,
-)
-
 
 def test_fixture_camera(mock_camera: Any) -> None:
     """Test camera fixture provides working camera."""
@@ -90,7 +78,11 @@ def test_fixture_robot_arm(mock_robot_arm: Any) -> None:
     assert len(mock_robot_arm) >= 3  # At least 3 joints
 
     # Check first 3 joints (handle dict or list)
-    joints = list(mock_robot_arm.values()) if isinstance(mock_robot_arm, dict) else list(mock_robot_arm)
+    joints = (
+        list(mock_robot_arm.values())
+        if isinstance(mock_robot_arm, dict)
+        else list(mock_robot_arm)
+    )
     for joint in joints[:3]:
         assert joint.is_enabled()
         joint.set_position(0.5)
@@ -181,10 +173,13 @@ def test_fixture_nested_usage(mock_pick_and_place: Any) -> None:
     """Test fixtures work with nested test functions."""
 
     def inner_operation() -> bool:
-        return mock_pick_and_place.move_to_object("cup")
+        result: bool = mock_pick_and_place.move_to_object("cup")
+        return result
 
     def outer_operation() -> bool:
-        return inner_operation() and mock_pick_and_place.grasp_object("cup")
+        result1: bool = inner_operation()
+        result2: bool = mock_pick_and_place.grasp_object("cup")
+        return result1 and result2
 
     success = outer_operation()
     assert success
@@ -247,8 +242,12 @@ def test_fixture_robot_arm_coordinated_motion(mock_robot_arm: Any) -> None:
     positions = [0.5, 1.0, 1.5]
 
     # Handle both dict and list
-    joints = list(mock_robot_arm.values()) if isinstance(mock_robot_arm, dict) else list(mock_robot_arm)
-    
+    joints = (
+        list(mock_robot_arm.values())
+        if isinstance(mock_robot_arm, dict)
+        else list(mock_robot_arm)
+    )
+
     for joint, position in zip(joints[:3], positions):
         joint.set_position(position)
 

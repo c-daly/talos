@@ -1,9 +1,8 @@
 """Advanced tests for telemetry system including persistence, export, and edge cases."""
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any, Dict, List
-import pytest
 
 from talos.telemetry import TelemetryRecorder, TelemetryEvent, EventType
 from talos.actuators import SimulatedMotor, SimulatedGripper
@@ -37,9 +36,8 @@ def test_telemetry_filter_by_time_range() -> None:
     events = recorder.get_events()
     assert len(events) == 5
 
-    # Get earliest and latest timestamps
+    # Get earliest timestamp
     earliest = events[0].timestamp
-    latest = events[-1].timestamp
 
     # Filter by checking timestamps manually (since get_events doesn't support time filters)
     # This tests that timestamps are properly set and ordered
@@ -140,9 +138,7 @@ def test_telemetry_query_performance_large_dataset() -> None:
 
     # Record large number of events
     for i in range(5000):
-        recorder.record_event(
-            EventType.POSITION_SET, f"motor{i % 10}", {"index": i}
-        )
+        recorder.record_event(EventType.POSITION_SET, f"motor{i % 10}", {"index": i})
 
     # Query should be fast even with large dataset
     start = datetime.now()
@@ -249,7 +245,7 @@ def test_telemetry_state_transitions() -> None:
     assert EventType.OBJECT_GRASPED in event_types
     assert EventType.OBJECT_RELEASED in event_types
     assert EventType.GRIPPER_OPENED in event_types
-    
+
     # Verify object names
     grasp_events = [e for e in events if e.event_type == EventType.OBJECT_GRASPED]
     assert len(grasp_events) == 2
@@ -283,9 +279,7 @@ def test_telemetry_data_integrity() -> None:
         assert event_dict["actuator_name"] == "test_motor"
 
     # Verify specific events
-    position_events = [
-        e for e in events_dict if e["event_type"] == "position_set"
-    ]
+    position_events = [e for e in events_dict if e["event_type"] == "position_set"]
     assert len(position_events) == 2
     assert position_events[0]["data"]["clamped_position"] == 1.5
     assert position_events[1]["data"]["clamped_position"] == -1.0

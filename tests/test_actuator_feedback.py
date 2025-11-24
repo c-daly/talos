@@ -1,7 +1,6 @@
 """Tests for actuator feedback loops and coordination."""
 
 import pytest
-from typing import List
 
 from talos.actuators import SimulatedMotor, SimulatedGripper
 from talos.telemetry import TelemetryRecorder, EventType
@@ -73,7 +72,7 @@ def test_actuator_timeout_handling() -> None:
 
     # Disable and attempt to set position (simulates timeout)
     motor.disable()
-    
+
     # Motor is disabled, so it should not change position
     # The implementation doesn't explicitly prevent this, but typically
     # a real actuator would timeout or fail
@@ -254,9 +253,7 @@ def test_gripper_state_transitions() -> None:
 def test_actuator_concurrent_operations() -> None:
     """Test concurrent actuator operations don't interfere."""
     telemetry = TelemetryRecorder()
-    motors = [
-        SimulatedMotor(name=f"motor{i}", telemetry=telemetry) for i in range(5)
-    ]
+    motors = [SimulatedMotor(name=f"motor{i}", telemetry=telemetry) for i in range(5)]
 
     # Set all motors simultaneously
     for i, motor in enumerate(motors):

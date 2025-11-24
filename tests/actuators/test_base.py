@@ -6,7 +6,7 @@ from talos.actuators.base import Actuator
 class ConcreteActuator(Actuator):
     """Concrete actuator implementation for testing."""
 
-    def get_state(self):
+    def get_state(self) -> dict[str, str]:
         return {"test": "state"}
 
 

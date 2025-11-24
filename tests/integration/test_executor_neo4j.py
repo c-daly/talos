@@ -138,16 +138,12 @@ def test_executor_creates_location_node(executor: ExecutorShim) -> None:
 def test_executor_updates_robot_location(executor: ExecutorShim) -> None:
     """Test that executor updates robot location in Neo4j."""
     # Move to first location
-    move1 = PlanNode(
-        node_id="test_005", action_type=ActionType.MOVE_TO, target="table"
-    )
+    move1 = PlanNode(node_id="test_005", action_type=ActionType.MOVE_TO, target="table")
     executor.execute_plan_node(move1)
     assert executor.get_robot_location() == "table"
 
     # Move to second location
-    move2 = PlanNode(
-        node_id="test_006", action_type=ActionType.MOVE_TO, target="shelf"
-    )
+    move2 = PlanNode(node_id="test_006", action_type=ActionType.MOVE_TO, target="shelf")
     executor.execute_plan_node(move2)
     assert executor.get_robot_location() == "shelf"
 
@@ -181,9 +177,7 @@ def test_executor_action_history_persists(executor: ExecutorShim) -> None:
 def test_executor_concurrent_actions(executor: ExecutorShim) -> None:
     """Test executor handles multiple objects correctly."""
     # Grasp first object
-    grasp_cup = PlanNode(
-        node_id="conc_001", action_type=ActionType.GRASP, target="cup"
-    )
+    grasp_cup = PlanNode(node_id="conc_001", action_type=ActionType.GRASP, target="cup")
     executor.execute_plan_node(grasp_cup)
 
     # Grasp second object (simulating multi-gripper or sequence)

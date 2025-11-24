@@ -1,6 +1,5 @@
 """Comprehensive Milvus integration tests for Talos."""
 
-import os
 from typing import Generator
 import uuid
 import numpy as np
@@ -8,7 +7,7 @@ import pytest
 
 # Conditional imports for optional dependencies
 try:
-    from pymilvus import (
+    from pymilvus import (  # type: ignore[import-untyped]
         Collection,
         CollectionSchema,
         DataType,
@@ -93,6 +92,14 @@ def test_embedding_storage_for_sensor_data(
     schema = CollectionSchema(fields=fields)
     collection = Collection(name=collection_name, schema=schema)
 
+    # Create index before loading
+    index_params = {
+        "metric_type": "L2",
+        "index_type": "IVF_FLAT",
+        "params": {"nlist": 128},
+    }
+    collection.create_index(field_name="embedding", index_params=index_params)
+
     # Store sensor embedding
     sensor_id = str(uuid.uuid4())
     sensor_data_json = '{"sensor": "camera", "timestamp": "2024-01-01T00:00:00Z"}'
@@ -137,9 +144,7 @@ def test_embedding_retrieval_by_similarity(
     ids = [str(uuid.uuid4()) for _ in range(10)]
     texts = [f"sensor_data_{i}" for i in range(10)]
 
-    collection.insert(
-        [ids, texts, [emb.tolist() for emb in embeddings]]
-    )
+    collection.insert([ids, texts, [emb.tolist() for emb in embeddings]])
     collection.flush()
     collection.load()
 
@@ -176,6 +181,14 @@ def test_metadata_linkage_to_neo4j_uuids(
     ]
     schema = CollectionSchema(fields=fields)
     collection = Collection(name=collection_name, schema=schema)
+
+    # Create index before loading
+    index_params = {
+        "metric_type": "L2",
+        "index_type": "IVF_FLAT",
+        "params": {"nlist": 128},
+    }
+    collection.create_index(field_name="embedding", index_params=index_params)
 
     # Insert with Neo4j UUID
     milvus_id = str(uuid.uuid4())
@@ -256,6 +269,14 @@ def test_concurrent_embedding_operations(
     schema = CollectionSchema(fields=fields)
     collection = Collection(name=collection_name, schema=schema)
 
+    # Create index before loading
+    index_params = {
+        "metric_type": "L2",
+        "index_type": "IVF_FLAT",
+        "params": {"nlist": 128},
+    }
+    collection.create_index(field_name="embedding", index_params=index_params)
+
     # Insert multiple embeddings concurrently (in rapid succession)
     num_embeddings = 50
     ids = [str(uuid.uuid4()) for _ in range(num_embeddings)]
@@ -287,6 +308,14 @@ def test_large_batch_embedding_storage(
     ]
     schema = CollectionSchema(fields=fields)
     collection = Collection(name=collection_name, schema=schema)
+
+    # Create index before loading
+    index_params = {
+        "metric_type": "L2",
+        "index_type": "IVF_FLAT",
+        "params": {"nlist": 128},
+    }
+    collection.create_index(field_name="embedding", index_params=index_params)
 
     # Insert large batch
     batch_size = 1000
@@ -334,9 +363,7 @@ def test_collection_indexing(milvus_connection: None, collection_name: str) -> N
 
 
 @pytest.mark.skipif(not milvus_available(), reason="Milvus not available")
-def test_collection_persistence(
-    milvus_connection: None, collection_name: str
-) -> None:
+def test_collection_persistence(milvus_connection: None, collection_name: str) -> None:
     """Test collection data persistence."""
     # Create and populate collection
     fields = [
@@ -345,6 +372,14 @@ def test_collection_persistence(
     ]
     schema = CollectionSchema(fields=fields)
     collection = Collection(name=collection_name, schema=schema)
+
+    # Create index before loading
+    index_params = {
+        "metric_type": "L2",
+        "index_type": "IVF_FLAT",
+        "params": {"nlist": 128},
+    }
+    collection.create_index(field_name="embedding", index_params=index_params)
 
     # Insert data
     test_id = str(uuid.uuid4())

@@ -5,13 +5,11 @@ to validate complete workflows with real services where available.
 """
 
 import os
-from typing import Generator
 import pytest
-from unittest.mock import patch
 
 from talos.scenarios.pick_and_place import PickAndPlaceScenario
 from talos.executor import ExecutorShim, PlanNode, ActionType
-from talos.telemetry import TelemetryRecorder, EventType
+from talos.telemetry import EventType
 
 
 # Integration test marker
@@ -96,8 +94,6 @@ def test_sensor_reading_to_planning_execution_loop(
 @pytest.mark.skipif(not neo4j_available(), reason="Neo4j not available")
 def test_executor_feedback_replanning_flow() -> None:
     """Test executor feedback → replanning flow."""
-    from neo4j import GraphDatabase
-
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USERNAME", "neo4j")
     password = os.getenv("NEO4J_PASSWORD", "testpassword")
@@ -115,6 +111,7 @@ def test_executor_feedback_replanning_flow() -> None:
 
         # Get feedback from executor
         cup_state = executor.get_object_state("cup")
+        assert cup_state is not None
         assert cup_state["grasped"]
 
         # Replan based on feedback: release object
@@ -128,6 +125,7 @@ def test_executor_feedback_replanning_flow() -> None:
 
         # Verify replanning worked
         cup_state_after = executor.get_object_state("cup")
+        assert cup_state_after is not None
         assert not cup_state_after["grasped"]
 
     finally:
@@ -249,8 +247,6 @@ def test_resource_cleanup_after_scenario(
 @pytest.mark.skipif(not neo4j_available(), reason="Neo4j not available")
 def test_complete_workflow_with_neo4j() -> None:
     """Test complete workflow with Neo4j integration."""
-    from neo4j import GraphDatabase
-
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USERNAME", "neo4j")
     password = os.getenv("NEO4J_PASSWORD", "testpassword")
@@ -279,6 +275,7 @@ def test_complete_workflow_with_neo4j() -> None:
 
         # Step 4: Verify state in Neo4j
         cup_state = executor.get_object_state("cup")
+        assert cup_state is not None
         assert cup_state["grasped"]
 
         # Step 5: Continue workflow
@@ -299,6 +296,7 @@ def test_complete_workflow_with_neo4j() -> None:
         executor.execute_plan_node(release_plan)
 
         cup_state_final = executor.get_object_state("cup")
+        assert cup_state_final is not None
         assert not cup_state_final["grasped"]
 
     finally:
