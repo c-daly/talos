@@ -184,6 +184,7 @@ class ExecutorShim:
         position = plan_node.parameters.get("position", None)
 
         # Create or update the location node and create relationship
+        # Delete old AT_LOCATION relationships to ensure only one current location
         query = """
         MERGE (loc:Location {name: $target})
         SET loc.last_action = $action_type,
@@ -191,7 +192,10 @@ class ExecutorShim:
             loc.updated_at = datetime()
         WITH loc
         MERGE (state:RobotState {id: 'current'})
-        MERGE (state)-[r:AT_LOCATION]->(loc)
+        WITH state, loc
+        OPTIONAL MATCH (state)-[old:AT_LOCATION]->()
+        DELETE old
+        CREATE (state)-[r:AT_LOCATION]->(loc)
         SET r.updated_at = datetime()
         RETURN loc, state
         """
@@ -210,7 +214,10 @@ class ExecutorShim:
                 loc.updated_at = datetime()
             WITH loc
             MERGE (state:RobotState {id: 'current'})
-            MERGE (state)-[r:AT_LOCATION]->(loc)
+            WITH state, loc
+            OPTIONAL MATCH (state)-[old:AT_LOCATION]->()
+            DELETE old
+            CREATE (state)-[r:AT_LOCATION]->(loc)
             SET r.updated_at = datetime()
             RETURN loc, state
             """

@@ -172,7 +172,9 @@ def test_fixture_cleanup_gripper(mock_gripper: Any) -> None:
     # After test, fixture cleanup should disable it
 
 
-def test_multiple_fixtures_together(mock_motor: Any, mock_gripper: Any, mock_telemetry: Any) -> None:
+def test_multiple_fixtures_together(
+    mock_motor: Any, mock_gripper: Any, mock_telemetry: Any
+) -> None:
     """Test using multiple fixtures together."""
     # Create motor and gripper with shared telemetry
     motor = SimulatedMotor(name="arm_motor", telemetry=mock_telemetry)

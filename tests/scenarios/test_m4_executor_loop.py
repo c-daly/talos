@@ -193,7 +193,9 @@ def mock_neo4j_driver() -> MockNeo4jDriver:
 
 
 @pytest.fixture
-def executor_shim(mock_neo4j_driver: MockNeo4jDriver) -> Generator[ExecutorShim, None, None]:
+def executor_shim(
+    mock_neo4j_driver: MockNeo4jDriver,
+) -> Generator[ExecutorShim, None, None]:
     """Provide an executor shim with mock Neo4j driver."""
     with patch(
         "talos.executor.shim.GraphDatabase.driver", return_value=mock_neo4j_driver
