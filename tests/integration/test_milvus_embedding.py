@@ -19,7 +19,7 @@ import pytest
 
 # Conditional imports for optional dependencies
 try:
-    from pymilvus import (
+    from pymilvus import (  # type: ignore[import-untyped]
         Collection,
         CollectionSchema,
         DataType,
@@ -360,7 +360,7 @@ def test_multiple_embeddings_mock_mode(
         "Second test document",
         "Third test document",
     ]
-    embedding_ids = []
+    embedding_ids: list[str] = []
 
     for text in texts:
         embedding = np.random.rand(128).astype(np.float32)

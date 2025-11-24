@@ -4,9 +4,11 @@ This test validates the executor shim that applies plan steps to Neo4j,
 representing Talos action feedback without requiring hardware.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Generator, List, Optional, cast
 from unittest.mock import patch
 import pytest
+import numpy as np
+import numpy.typing as npt
 
 from talos.executor import ExecutorShim, PlanNode, ActionType
 from talos.scenarios.pick_and_place import PickAndPlaceScenario
@@ -191,7 +193,9 @@ def mock_neo4j_driver() -> MockNeo4jDriver:
 
 
 @pytest.fixture
-def executor_shim(mock_neo4j_driver: MockNeo4jDriver) -> ExecutorShim:
+def executor_shim(
+    mock_neo4j_driver: MockNeo4jDriver,
+) -> Generator[ExecutorShim, None, None]:
     """Provide an executor shim with mock Neo4j driver."""
     with patch(
         "talos.executor.shim.GraphDatabase.driver", return_value=mock_neo4j_driver
@@ -341,11 +345,12 @@ def test_m4_pick_and_place_simulation(executor_shim: ExecutorShim) -> None:
 
     # Step 1: Move to object location
     scenario.move_to_object("cup")
+    position = cast(npt.NDArray[np.float64], scenario.objects["cup"]["position"])
     move_node = PlanNode(
         node_id="m4_plan_001",
         action_type=ActionType.MOVE_TO,
         target="cup_location",
-        parameters={"position": scenario.objects["cup"]["position"].tolist()},
+        parameters={"position": position.tolist()},
     )
     move_result = executor_shim.execute_plan_node(move_node)
     assert move_result["success"] is True

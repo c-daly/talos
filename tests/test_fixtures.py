@@ -4,6 +4,8 @@ This file demonstrates how to use the mock hardware fixtures provided
 by Talos for testing robotic scenarios.
 """
 
+from typing import Any
+
 from talos.actuators import SimulatedMotor
 from talos.telemetry import EventType
 
@@ -11,7 +13,7 @@ from talos.telemetry import EventType
 # No need to import them explicitly
 
 
-def test_mock_camera_fixture(mock_camera):
+def test_mock_camera_fixture(mock_camera: Any) -> None:
     """Test the mock camera fixture."""
     assert mock_camera is not None
     assert mock_camera.is_enabled()
@@ -22,7 +24,7 @@ def test_mock_camera_fixture(mock_camera):
     assert image.shape == (480, 640, 3)
 
 
-def test_mock_depth_sensor_fixture(mock_depth_sensor):
+def test_mock_depth_sensor_fixture(mock_depth_sensor: Any) -> None:
     """Test the mock depth sensor fixture."""
     assert mock_depth_sensor is not None
     assert mock_depth_sensor.is_enabled()
@@ -33,7 +35,7 @@ def test_mock_depth_sensor_fixture(mock_depth_sensor):
     assert depth_map.shape == (240, 320)
 
 
-def test_mock_imu_fixture(mock_imu):
+def test_mock_imu_fixture(mock_imu: Any) -> None:
     """Test the mock IMU fixture."""
     assert mock_imu is not None
     assert mock_imu.is_enabled()
@@ -46,7 +48,7 @@ def test_mock_imu_fixture(mock_imu):
     assert len(gyroscope) == 3
 
 
-def test_mock_motor_fixture(mock_motor):
+def test_mock_motor_fixture(mock_motor: Any) -> None:
     """Test the mock motor fixture."""
     assert mock_motor is not None
     assert mock_motor.is_enabled()
@@ -60,7 +62,7 @@ def test_mock_motor_fixture(mock_motor):
     assert state["position"] == 1.57
 
 
-def test_mock_gripper_fixture(mock_gripper):
+def test_mock_gripper_fixture(mock_gripper: Any) -> None:
     """Test the mock gripper fixture."""
     assert mock_gripper is not None
     assert mock_gripper.is_enabled()
@@ -75,7 +77,7 @@ def test_mock_gripper_fixture(mock_gripper):
     assert state["opening"] > 0.0
 
 
-def test_mock_telemetry_fixture(mock_telemetry):
+def test_mock_telemetry_fixture(mock_telemetry: Any) -> None:
     """Test the mock telemetry fixture."""
     assert mock_telemetry is not None
     assert mock_telemetry.get_event_count() == 0
@@ -93,7 +95,7 @@ def test_mock_telemetry_fixture(mock_telemetry):
     assert len(position_events) > 0
 
 
-def test_mock_pick_and_place_fixture(mock_pick_and_place):
+def test_mock_pick_and_place_fixture(mock_pick_and_place: Any) -> None:
     """Test the mock pick and place scenario fixture."""
     scenario = mock_pick_and_place
 
@@ -113,7 +115,7 @@ def test_mock_pick_and_place_fixture(mock_pick_and_place):
     assert scenario.telemetry.get_event_count() > 0
 
 
-def test_mock_robot_arm_fixture(mock_robot_arm):
+def test_mock_robot_arm_fixture(mock_robot_arm: Any) -> None:
     """Test the mock robot arm fixture."""
     arm = mock_robot_arm
 
@@ -133,7 +135,7 @@ def test_mock_robot_arm_fixture(mock_robot_arm):
     assert arm["joint3"].get_position() == 1.5
 
 
-def test_mock_sensor_suite_fixture(mock_sensor_suite):
+def test_mock_sensor_suite_fixture(mock_sensor_suite: Any) -> None:
     """Test the mock sensor suite fixture."""
     sensors = mock_sensor_suite
 
@@ -154,7 +156,7 @@ def test_mock_sensor_suite_fixture(mock_sensor_suite):
     assert gyroscope is not None
 
 
-def test_fixture_cleanup_camera(mock_camera):
+def test_fixture_cleanup_camera(mock_camera: Any) -> None:
     """Test that camera fixture is cleaned up properly."""
     # Verify camera is enabled initially
     assert mock_camera.is_enabled()
@@ -162,7 +164,7 @@ def test_fixture_cleanup_camera(mock_camera):
     # This is verified implicitly by the fixture's teardown
 
 
-def test_fixture_cleanup_gripper(mock_gripper):
+def test_fixture_cleanup_gripper(mock_gripper: Any) -> None:
     """Test that gripper fixture is cleaned up properly."""
     # Use the gripper
     mock_gripper.close()
@@ -170,7 +172,9 @@ def test_fixture_cleanup_gripper(mock_gripper):
     # After test, fixture cleanup should disable it
 
 
-def test_multiple_fixtures_together(mock_motor, mock_gripper, mock_telemetry):
+def test_multiple_fixtures_together(
+    mock_motor: Any, mock_gripper: Any, mock_telemetry: Any
+) -> None:
     """Test using multiple fixtures together."""
     # Create motor and gripper with shared telemetry
     motor = SimulatedMotor(name="arm_motor", telemetry=mock_telemetry)
@@ -185,7 +189,7 @@ def test_multiple_fixtures_together(mock_motor, mock_gripper, mock_telemetry):
     assert len(events) > 0
 
 
-def test_scenario_with_telemetry(mock_pick_and_place):
+def test_scenario_with_telemetry(mock_pick_and_place: Any) -> None:
     """Test that scenario fixture includes telemetry tracking."""
     scenario = mock_pick_and_place
 
@@ -202,7 +206,7 @@ def test_scenario_with_telemetry(mock_pick_and_place):
     assert len(grasp_events) == 1
 
 
-def test_robot_arm_coordination(mock_robot_arm, mock_telemetry):
+def test_robot_arm_coordination(mock_robot_arm: Any, mock_telemetry: Any) -> None:
     """Test coordinated motion across robot arm joints."""
     arm = mock_robot_arm
 
@@ -225,7 +229,7 @@ def test_robot_arm_coordination(mock_robot_arm, mock_telemetry):
     assert len(position_events) == 3
 
 
-def test_sensor_suite_all_enabled(mock_sensor_suite):
+def test_sensor_suite_all_enabled(mock_sensor_suite: Any) -> None:
     """Test that all sensors in suite are enabled by default."""
     sensors = mock_sensor_suite
 
@@ -233,7 +237,7 @@ def test_sensor_suite_all_enabled(mock_sensor_suite):
         assert sensor.is_enabled(), f"{sensor_name} should be enabled"
 
 
-def test_pick_and_place_reset(mock_pick_and_place):
+def test_pick_and_place_reset(mock_pick_and_place: Any) -> None:
     """Test that scenario can be reset between operations."""
     scenario = mock_pick_and_place
 
