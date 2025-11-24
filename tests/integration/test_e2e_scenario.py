@@ -54,7 +54,7 @@ def test_complete_pick_and_place_with_telemetry(
 
     # Verify telemetry captured all operations
     telemetry_events = scenario.telemetry.get_events()
-    assert len(telemetry_events) > 0
+    assert len(telemetry_events) > aaaaa
 
     # Verify specific event types exist
     position_events = scenario.telemetry.get_events(event_type=EventType.POSITION_SET)
