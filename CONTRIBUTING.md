@@ -4,6 +4,31 @@ Thank you for your interest in contributing to Talos, the hardware abstraction l
 
 ## Development Setup
 
+### Prerequisites
+
+- Python 3.11 or higher
+- Poetry (recommended) or pip
+
+### Setup with Poetry (Recommended)
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/c-daly/talos.git
+   cd talos
+   ```
+
+2. Install dependencies:
+   ```bash
+   poetry install --with dev
+   ```
+
+3. Activate the virtual environment:
+   ```bash
+   poetry shell
+   ```
+
+### Setup with pip
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/c-daly/talos.git
@@ -21,16 +46,48 @@ Thank you for your interest in contributing to Talos, the hardware abstraction l
    pip install -e ".[dev]"
    ```
 
+## CI Parity: Running All Checks Locally
+
+Before opening a pull request, run these commands to mirror the GitHub Actions CI pipeline:
+
+```bash
+poetry install --with dev
+poetry run ruff check src tests
+poetry run black --check src tests
+poetry run mypy src
+poetry run pytest --cov=talos --cov-report=term-missing --cov-report=xml --cov-fail-under=95
+```
+
+All checks must pass for your PR to be merged.
+
 ## Running Tests
 
+With Poetry:
+```bash
+poetry run pytest
+```
+
+With pip:
 ```bash
 pytest
 ```
 
+For coverage reporting:
+```bash
+poetry run pytest --cov=talos --cov-report=term-missing
+```
+
 ## Code Style
 
-We use `black` for code formatting and `ruff` for linting:
+We use `black` for code formatting and `ruff` for linting.
 
+With Poetry:
+```bash
+poetry run black src/ tests/
+poetry run ruff check src/ tests/
+```
+
+With pip:
 ```bash
 black src/ tests/
 ruff check src/ tests/
@@ -38,6 +95,12 @@ ruff check src/ tests/
 
 ## Type Checking
 
+With Poetry:
+```bash
+poetry run mypy src/
+```
+
+With pip:
 ```bash
 mypy src/
 ```
