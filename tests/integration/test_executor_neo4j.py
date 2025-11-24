@@ -21,7 +21,7 @@ def neo4j_available() -> bool:
     """Check if Neo4j is available for testing."""
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USERNAME", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "testpassword")
+    password = os.getenv("NEO4J_PASSWORD", "logosdev")
 
     try:
         driver = GraphDatabase.driver(uri, auth=(username, password))
@@ -48,7 +48,7 @@ def neo4j_username() -> str:
 @pytest.fixture(scope="module")
 def neo4j_password() -> str:
     """Get Neo4j password from environment or use default."""
-    return os.getenv("NEO4J_PASSWORD", "testpassword")
+    return os.getenv("NEO4J_PASSWORD", "logosdev")
 
 
 @pytest.fixture
@@ -199,8 +199,10 @@ def test_executor_concurrent_actions(executor: ExecutorShim) -> None:
 @pytest.mark.skipif(not neo4j_available(), reason="Neo4j not available")
 def test_executor_neo4j_connection_failure() -> None:
     """Test error handling when Neo4j connection fails."""
+    executor = ExecutorShim("bolt://invalid:7687", "neo4j", "password")
+    # Driver is lazy, so we need to actually attempt an operation to trigger connection
     with pytest.raises((ServiceUnavailable, Exception)):
-        ExecutorShim("bolt://invalid:7687", "neo4j", "password")
+        executor.get_robot_location()
 
 
 @pytest.mark.skipif(not neo4j_available(), reason="Neo4j not available")
