@@ -38,43 +38,37 @@ talos/
     └── shim.py       # Minimal executor that applies plan steps to Neo4j
 ```
 
-## Installation
+#### Integration Tests
 
-### Prerequisites
+Talos includes integration tests for external services like Milvus (vector database) and Neo4j. These tests validate:
 
-- Python 3.11 or higher
-- Poetry (recommended) or pip
+- Milvus collection initialization and configuration
+- Embedding storage and retrieval via sync utilities (simulating Hermes)
+- Metadata/UUID verification in Neo4j
+- Health checks and collection count assertions
 
-### Installing with Poetry (Recommended)
+Use the shared helper to bring up the LOGOS stack, wait for health, and run `pytest` in one step:
 
-Poetry provides better dependency management and reproducible builds.
+```bash
+cd /home/fearsidhe/projects/LOGOS/talos
+./scripts/run_integration_stack.sh                # defaults to pytest -m integration -v
+./scripts/run_integration_stack.sh tests/integration/test_executor_neo4j.py -v
+```
 
-1. **Install Poetry** (if not already installed):
-   ```bash
-   # Via pip
-   pip install poetry
-   
-   # Or via the official installer (recommended)
-   curl -sSL https://install.python-poetry.org | python3 -
-   ```
+Key environment overrides:
 
-2. **Clone the repository**:
-   ```bash
-   git clone https://github.com/c-daly/talos.git
-   cd talos
-   ```
+- `COMPOSE_FILE` – path to the LOGOS docker compose file (defaults to `../logos/infra/docker-compose.hcg.dev.yml`).
+- `REUSE_EXISTING_STACK=1` – skip `docker compose up` if you already have the stack running.
+- `KEEP_STACK_RUNNING=1` – leave services up after pytest completes.
+- `NEO4J_*` / `MILVUS_*` – override connection info used by the tests.
 
-3. **Install dependencies**:
-   ```bash
-   # Install all dependencies (including dev dependencies)
-   poetry install
-   
-   # Or install only production dependencies
-   poetry install --without dev
-   ```
+If you prefer bringing up services manually, ensure Neo4j and Milvus are running (see `docs/INTEGRATION_TESTING.md`) and then:
 
-4. **Activate the virtual environment**:
-   ```bash
+```bash
+poetry run pytest -m integration
+```
+
+To target a specific file or test, pass the usual pytest arguments either directly to `run_integration_stack.sh` or to `poetry run pytest` if the stack is already running.
    # Option 1: Spawn a shell within the virtual environment
    poetry shell
    
