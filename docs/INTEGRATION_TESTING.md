@@ -1,135 +1,131 @@
 # Integration Testing with LOGOS Infrastructure
 
-Talos integration tests use the shared LOGOS infrastructure for Neo4j and Milvus.
+Talos integration tests depend on the shared LOGOS HCG stack (Neo4j + Milvus). The
+repository now ships a helper script that mirrors the workflow used in Sophia and
+Hermes so contributors do not have to memorize Docker commands.
 
-## Prerequisites
+## Recommended Workflow: `scripts/run_integration_stack.sh`
 
-1. Start the LOGOS HCG development cluster:
 ```bash
-# From the LOGOS root directory
-cd /home/fearsidhe/projects/LOGOS/logos
-docker compose -f infra/docker-compose.hcg.dev.yml up -d
+cd /home/fearsidhe/projects/LOGOS/talos
+./scripts/run_integration_stack.sh                # starts stack + runs pytest -m integration -v
+./scripts/run_integration_stack.sh tests/integration/test_executor_neo4j.py -k grasp
 ```
 
-2. Verify services are running:
+The helper:
+
+1. Checks for port conflicts on 7474/7687/19530/9091 before starting services.
+2. Uses `docker compose ps -q` to locate the actual container IDs from
+	 `../logos/infra/docker-compose.hcg.dev.yml` (override with `COMPOSE_FILE`).
+3. Polls health (Neo4j) or running state (Milvus) with log tailing on failure.
+4. Exports the expected `NEO4J_*` / `MILVUS_*` variables, then runs pytest.
+
+### Environment Overrides
+
+| Variable | Description |
+| --- | --- |
+| `COMPOSE_FILE` | Path to the compose file (defaults to `../logos/infra/docker-compose.hcg.dev.yml`). |
+| `COMPOSE_CMD` | Change the compose binary, e.g. `COMPOSE_CMD="docker compose --project-name logos-hcg"`. |
+| `HEALTH_TIMEOUT` | Seconds to wait for each service before failing (default 180). |
+| `REUSE_EXISTING_STACK=1` | Skip `docker compose up`; assumes the stack is already running. |
+| `KEEP_STACK_RUNNING=1` | Leave services running after pytest completes. |
+| `RUN_TESTS=0` | Start the stack (and optionally keep it up) without invoking pytest. |
+| `PYTEST_BIN` | Override the pytest command (default `poetry run pytest`). |
+| `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` | Connection info passed to tests. |
+| `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`19530`). |
+
+Examples:
+
 ```bash
+# Keep services running for manual debugging
+KEEP_STACK_RUNNING=1 ./scripts/run_integration_stack.sh
+
+# Reuse an existing stack and only run a subset of tests
+REUSE_EXISTING_STACK=1 ./scripts/run_integration_stack.sh tests/integration/test_milvus_comprehensive.py -k metadata
+
+# Bring up services but skip pytest (useful for local dev shells)
+RUN_TESTS=0 KEEP_STACK_RUNNING=1 ./scripts/run_integration_stack.sh
+```
+
+## Manual Workflow (Fallback)
+
+If you cannot use the helper, bring up the stack manually from the `logos` repo:
+
+```bash
+cd /home/fearsidhe/projects/LOGOS/logos
+docker compose -f infra/docker-compose.hcg.dev.yml up -d neo4j milvus-standalone
 docker compose -f infra/docker-compose.hcg.dev.yml ps
 ```
 
 Expected services:
 - `logos-hcg-neo4j` (ports 7474, 7687)
-- `logos-hcg-milvus` (port 19530)
+- `logos-hcg-milvus` (ports 19530, 9091)
 
-## Running Integration Tests
-
-### Run All Tests (Unit + Integration)
+Then, from the Talos repository:
 
 ```bash
-cd /home/fearsidhe/projects/LOGOS/talos
+# Run unit + integration tests
 poetry run pytest
-```
 
-### Run Only Unit Tests (No Infrastructure Required)
-
-```bash
-poetry run pytest -m "not integration"
-```
-
-### Run Only Integration Tests
-
-```bash
+# Only integration tests
 poetry run pytest -m integration
-```
 
-### Run Specific Integration Test Files
-
-```bash
-# Neo4j executor tests
+# Targeted files
 poetry run pytest tests/integration/test_executor_neo4j.py -v
-
-# Milvus tests  
 poetry run pytest tests/integration/test_milvus_comprehensive.py -v
-
-# Sensor suite tests
 poetry run pytest tests/integration/test_sensor_suite.py -v
-
-# E2E scenario tests
 poetry run pytest tests/integration/test_e2e_scenario.py -v
 ```
 
-## Environment Variables
+## Test Behavior & Coverage
 
-Integration tests use these environment variables (with defaults):
+- Tests marked `@pytest.mark.integration` automatically skip when services are unavailable.
+- Default environment variables:
 
-```bash
-# Neo4j configuration
-export NEO4J_URI="bolt://localhost:7687"
-export NEO4J_USERNAME="neo4j"
-export NEO4J_PASSWORD="logosdev"
+	```bash
+	export NEO4J_URI="bolt://localhost:7687"
+	export NEO4J_USERNAME="neo4j"
+	export NEO4J_PASSWORD="logosdev"
+	export MILVUS_HOST="localhost"
+	export MILVUS_PORT="19530"
+	```
 
-# Milvus configuration  
-export MILVUS_HOST="localhost"
-export MILVUS_PORT="19530"
-```
+- CI enforces **95%** coverage:
 
-## Test Behavior
-
-Integration tests automatically skip if services are unavailable:
-
-```
-SKIPPED [1] tests/integration/test_executor_neo4j.py:45: Neo4j not available
-```
-
-This allows CI to run unit tests without requiring infrastructure.
-
-## Coverage
-
-Run tests with coverage:
-
-```bash
-poetry run pytest --cov=talos --cov-report=term-missing --cov-report=xml
-```
-
-Target coverage: **95%**
+	```bash
+	poetry run pytest --cov=talos --cov-report=term-missing --cov-report=xml
+	```
 
 ## Troubleshooting
 
+### Script exits early
+
+- Port conflicts: the helper prints a warning. Stop the conflicting process or set
+	`REUSE_EXISTING_STACK=1` if you intentionally started a custom stack.
+- Health timeout: inspect the streamed logs printed by the script, then rerun.
+
 ### Tests Skip: "Neo4j not available"
 
-1. Check Neo4j is running:
 ```bash
 docker ps | grep neo4j
-```
-
-2. Test connection manually:
-```bash
 docker exec logos-hcg-neo4j cypher-shell -u neo4j -p logosdev "RETURN 1;"
 ```
 
 ### Tests Skip: "Milvus not available"
 
-1. Check Milvus is running:
 ```bash
 docker ps | grep milvus
-```
-
-2. Verify port is accessible:
-```bash
 nc -zv localhost 19530
 ```
 
 ### Clean Slate
 
-To reset test data:
-
 ```bash
-# Stop and remove volumes
 docker compose -f /home/fearsidhe/projects/LOGOS/logos/infra/docker-compose.hcg.dev.yml down -v
-
-# Restart fresh
 docker compose -f /home/fearsidhe/projects/LOGOS/logos/infra/docker-compose.hcg.dev.yml up -d
 ```
 
 ## CI/CD
 
-Integration tests are marked with `@pytest.mark.integration` and can be selectively run in CI pipelines.
+Integration tests are marked with `@pytest.mark.integration` and can be selectively run
+in CI pipelines. Use the helper locally to match CI expectations before opening a PR.
