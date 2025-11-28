@@ -85,7 +85,7 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 	```bash
 	export NEO4J_URI="bolt://localhost:7687"
 	export NEO4J_USERNAME="neo4j"
-	export NEO4J_PASSWORD="logosdev"
+	export NEO4J_PASSWORD="neo4jtest"
 	export MILVUS_HOST="localhost"
 	export MILVUS_PORT="19530"
 	```
@@ -108,7 +108,7 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 
 ```bash
 docker ps | grep neo4j
-docker exec logos-hcg-neo4j cypher-shell -u neo4j -p logosdev "RETURN 1;"
+docker exec logos-hcg-neo4j cypher-shell -u neo4j -p neo4jtest "RETURN 1;"
 ```
 
 ### Tests Skip: "Milvus not available"

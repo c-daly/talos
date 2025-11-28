@@ -23,7 +23,7 @@ def neo4j_available() -> bool:
 
         uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
         username = os.getenv("NEO4J_USERNAME", "neo4j")
-        password = os.getenv("NEO4J_PASSWORD", "testpassword")
+        password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
 
         driver = GraphDatabase.driver(uri, auth=(username, password))
         with driver.session() as session:
@@ -96,7 +96,7 @@ def test_executor_feedback_replanning_flow() -> None:
     """Test executor feedback → replanning flow."""
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USERNAME", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "testpassword")
+    password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
 
     executor = ExecutorShim(uri, username, password)
     executor.clear_database()
@@ -249,7 +249,7 @@ def test_complete_workflow_with_neo4j() -> None:
     """Test complete workflow with Neo4j integration."""
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USERNAME", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "testpassword")
+    password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
 
     # Create scenario and executor
     scenario = PickAndPlaceScenario()
