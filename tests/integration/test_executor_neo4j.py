@@ -21,7 +21,7 @@ def neo4j_available() -> bool:
     """Check if Neo4j is available for testing."""
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     username = os.getenv("NEO4J_USERNAME", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "logosdev")
+    password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
 
     try:
         driver = GraphDatabase.driver(uri, auth=(username, password))
@@ -48,7 +48,7 @@ def neo4j_username() -> str:
 @pytest.fixture(scope="module")
 def neo4j_password() -> str:
     """Get Neo4j password from environment or use default."""
-    return os.getenv("NEO4J_PASSWORD", "logosdev")
+    return os.getenv("NEO4J_PASSWORD", "neo4jtest")
 
 
 @pytest.fixture

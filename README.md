@@ -76,6 +76,24 @@ To target a specific file or test, pass the usual pytest arguments either direct
    poetry run python examples/sensor_example.py
    ```
 
+### Using Docker
+
+The recommended way to run Talos is using the pre-built Docker image:
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/c-daly/talos:latest
+
+# Run with environment variables
+docker run -p 8002:8002 \
+  -e NEO4J_URI=bolt://your-neo4j-host:7687 \
+  -e NEO4J_USER=neo4j \
+  -e NEO4J_PASSWORD=your-password \
+  -e MILVUS_HOST=your-milvus-host \
+  -e MILVUS_PORT=19530 \
+  ghcr.io/c-daly/talos:latest
+```
+
 ### Installing with pip
 
 If you prefer using pip:
