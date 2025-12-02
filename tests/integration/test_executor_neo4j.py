@@ -9,7 +9,7 @@ import pytest
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 
-from talos.env import get_neo4j_config, load_stack_env
+from talos.env import get_neo4j_config
 from talos.executor import ExecutorShim, PlanNode, ActionType
 
 
