@@ -1,8 +1,25 @@
 # Integration Testing with LOGOS Infrastructure
 
-Talos integration tests depend on the shared LOGOS HCG stack (Neo4j + Milvus). The
-repository now ships a helper script that mirrors the workflow used in Sophia and
-Hermes so contributors do not have to memorize Docker commands.
+Talos integration tests depend on Neo4j and Milvus. The stack configuration is
+**generated from LOGOS** using the `render-test-stacks` command, ensuring consistency
+across all repos.
+
+## Stack Configuration
+
+The test stack files are located in `tests/e2e/stack/talos/`:
+- `docker-compose.test.yml` - Neo4j + Milvus services
+- `.env.test` - Environment variables for the stack
+- `STACK_VERSION` - Git commit hash of logos that generated these files
+
+### Port Allocation
+
+Talos uses the 47xxx/49xxx port range to avoid conflicts:
+| Service | Host Port | Container Port |
+|---------|-----------|----------------|
+| Neo4j HTTP | 47474 | 7474 |
+| Neo4j Bolt | 47687 | 7687 |
+| Milvus gRPC | 49530 | 19530 |
+| Milvus Health | 49091 | 9091 |
 
 ## Recommended Workflow: `scripts/run_integration_stack.sh`
 
@@ -14,9 +31,9 @@ cd /home/fearsidhe/projects/LOGOS/talos
 
 The helper:
 
-1. Checks for port conflicts on 7474/7687/19530/9091 before starting services.
+1. Checks for port conflicts on 47474/47687/49530/49091 before starting services.
 2. Uses `docker compose ps -q` to locate the actual container IDs from
-	 `../logos/infra/docker-compose.hcg.dev.yml` (override with `COMPOSE_FILE`).
+	 `tests/e2e/stack/talos/docker-compose.test.yml` (override with `COMPOSE_FILE`).
 3. Polls health (Neo4j) or running state (Milvus) with log tailing on failure.
 4. Exports the expected `NEO4J_*` / `MILVUS_*` variables, then runs pytest.
 
@@ -24,8 +41,8 @@ The helper:
 
 | Variable | Description |
 | --- | --- |
-| `COMPOSE_FILE` | Path to the compose file (defaults to `../logos/infra/docker-compose.hcg.dev.yml`). |
-| `COMPOSE_CMD` | Change the compose binary, e.g. `COMPOSE_CMD="docker compose --project-name logos-hcg"`. |
+| `COMPOSE_FILE` | Path to the compose file (defaults to `tests/e2e/stack/talos/docker-compose.test.yml`). |
+| `COMPOSE_CMD` | Change the compose binary, e.g. `COMPOSE_CMD="docker compose --project-name talos-test"`. |
 | `HEALTH_TIMEOUT` | Seconds to wait for each service before failing (default 180). |
 | `REUSE_EXISTING_STACK=1` | Skip `docker compose up`; assumes the stack is already running. |
 | `KEEP_STACK_RUNNING=1` | Leave services running after pytest completes. |
@@ -33,7 +50,7 @@ The helper:
 | `PYTEST_BIN` | Override the pytest command (default `poetry run pytest`). |
 | `TALOS_REPO_ROOT` | Override automatic detection of the repository root (used by tests and scripts). |
 | `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` | Connection info passed to tests. |
-| `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`19530`). |
+| `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`49530`). |
 
 Examples:
 
@@ -81,14 +98,14 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 ## Test Behavior & Coverage
 
 - Tests marked `@pytest.mark.integration` automatically skip when services are unavailable.
-- Default environment variables:
+- Default environment variables (from `tests/e2e/stack/talos/.env.test`):
 
 	```bash
-	export NEO4J_URI="bolt://localhost:7687"
+	export NEO4J_URI="bolt://localhost:47687"
 	export NEO4J_USERNAME="neo4j"
 	export NEO4J_PASSWORD="neo4jtest"
 	export MILVUS_HOST="localhost"
-	export MILVUS_PORT="19530"
+	export MILVUS_PORT="49530"
 	```
 
 - CI enforces **95%** coverage:
@@ -96,6 +113,21 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 	```bash
 	poetry run pytest --cov=talos --cov-report=term-missing --cov-report=xml
 	```
+
+## Regenerating Stack Files
+
+If you need to update the stack configuration:
+
+```bash
+# From the LOGOS repo
+cd /path/to/logos
+poetry run render-test-stacks --repo talos
+
+# Copy the generated files to talos
+cp tests/e2e/stack/talos/* /path/to/talos/tests/e2e/stack/talos/
+```
+
+The `STACK_VERSION` file contains the LOGOS commit hash used to generate the files.
 
 ## Troubleshooting
 
@@ -109,21 +141,22 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 
 ```bash
 docker ps | grep neo4j
-docker exec logos-hcg-neo4j cypher-shell -u neo4j -p neo4jtest "RETURN 1;"
+docker exec talos-test-neo4j cypher-shell -u neo4j -p neo4jtest "RETURN 1;"
 ```
 
 ### Tests Skip: "Milvus not available"
 
 ```bash
 docker ps | grep milvus
-nc -zv localhost 19530
+nc -zv localhost 49530
 ```
 
 ### Clean Slate
 
 ```bash
-docker compose -f /home/fearsidhe/projects/LOGOS/logos/infra/docker-compose.hcg.dev.yml down -v
-docker compose -f /home/fearsidhe/projects/LOGOS/logos/infra/docker-compose.hcg.dev.yml up -d
+cd /path/to/talos
+docker compose -f tests/e2e/stack/talos/docker-compose.test.yml down -v
+docker compose -f tests/e2e/stack/talos/docker-compose.test.yml up -d
 ```
 
 ## CI/CD

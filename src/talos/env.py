@@ -17,11 +17,16 @@ from pathlib import Path
 
 
 def _default_env_path() -> Path:
-    """Get the default path to the test environment file."""
+    """Get the default path to the stack environment file."""
     override = os.getenv("TALOS_STACK_ENV")
     if override:
         return Path(override)
     repo_root = get_repo_root()
+    # Standard location for generated stack env file
+    candidate = repo_root / "tests" / "e2e" / "stack" / "talos" / ".env.test"
+    if candidate.exists():
+        return candidate
+    # Fallback to root .env.test (legacy location)
     return repo_root / ".env.test"
 
 
