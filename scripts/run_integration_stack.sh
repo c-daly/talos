@@ -7,17 +7,17 @@ if [[ -n "${TALOS_REPO_ROOT:-}" ]]; then
 else
   REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 fi
-DEFAULT_COMPOSE_FILE="$REPO_ROOT/../logos/infra/docker-compose.hcg.dev.yml"
+DEFAULT_COMPOSE_FILE="$REPO_ROOT/tests/e2e/stack/talos/docker-compose.test.yml"
 COMPOSE_CMD=${COMPOSE_CMD:-"docker compose"}
 COMPOSE_FILE=${COMPOSE_FILE:-"$DEFAULT_COMPOSE_FILE"}
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-180}
 PORTS_TO_CHECK=(
-  "7474:Neo4j HTTP"
-  "7687:Neo4j Bolt"
-  "19530:Milvus gRPC"
-  "9091:Milvus Metrics"
+  "47474:Neo4j HTTP"
+  "47687:Neo4j Bolt"
+  "49530:Milvus gRPC"
+  "49091:Milvus Metrics"
 )
-SERVICES=("neo4j" "milvus-standalone")
+SERVICES=("neo4j" "milvus")
 KEEP_STACK_RUNNING=${KEEP_STACK_RUNNING:-0}
 REUSE_EXISTING_STACK=${REUSE_EXISTING_STACK:-0}
 RUN_TESTS=${RUN_TESTS:-1}
