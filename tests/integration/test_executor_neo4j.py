@@ -4,12 +4,12 @@ These tests require a running Neo4j instance and are designed to skip gracefully
 when Neo4j is not available.
 """
 
-import os
 from typing import Generator
 import pytest
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 
+from talos.env import get_neo4j_config, load_stack_env
 from talos.executor import ExecutorShim, PlanNode, ActionType
 
 
@@ -19,12 +19,12 @@ pytestmark = pytest.mark.integration
 
 def neo4j_available() -> bool:
     """Check if Neo4j is available for testing."""
-    uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-    username = os.getenv("NEO4J_USERNAME", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
+    config = get_neo4j_config()
 
     try:
-        driver = GraphDatabase.driver(uri, auth=(username, password))
+        driver = GraphDatabase.driver(
+            config["uri"], auth=(config["user"], config["password"])
+        )
         with driver.session() as session:
             session.run("RETURN 1")
         driver.close()
@@ -34,21 +34,27 @@ def neo4j_available() -> bool:
 
 
 @pytest.fixture(scope="module")
-def neo4j_uri() -> str:
-    """Get Neo4j URI from environment or use default."""
-    return os.getenv("NEO4J_URI", "bolt://localhost:7687")
+def neo4j_config() -> dict[str, str]:
+    """Get Neo4j connection configuration."""
+    return get_neo4j_config()
 
 
 @pytest.fixture(scope="module")
-def neo4j_username() -> str:
-    """Get Neo4j username from environment or use default."""
-    return os.getenv("NEO4J_USERNAME", "neo4j")
+def neo4j_uri(neo4j_config: dict[str, str]) -> str:
+    """Get Neo4j URI from configuration."""
+    return neo4j_config["uri"]
 
 
 @pytest.fixture(scope="module")
-def neo4j_password() -> str:
-    """Get Neo4j password from environment or use default."""
-    return os.getenv("NEO4J_PASSWORD", "neo4jtest")
+def neo4j_username(neo4j_config: dict[str, str]) -> str:
+    """Get Neo4j username from configuration."""
+    return neo4j_config["user"]
+
+
+@pytest.fixture(scope="module")
+def neo4j_password(neo4j_config: dict[str, str]) -> str:
+    """Get Neo4j password from configuration."""
+    return neo4j_config["password"]
 
 
 @pytest.fixture

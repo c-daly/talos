@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+# Determine repo root: use TALOS_REPO_ROOT if set, otherwise compute from script location
+if [[ -n "${TALOS_REPO_ROOT:-}" ]]; then
+  REPO_ROOT="$TALOS_REPO_ROOT"
+else
+  REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+fi
 DEFAULT_COMPOSE_FILE="$REPO_ROOT/../logos/infra/docker-compose.hcg.dev.yml"
 COMPOSE_CMD=${COMPOSE_CMD:-"docker compose"}
 COMPOSE_FILE=${COMPOSE_FILE:-"$DEFAULT_COMPOSE_FILE"}

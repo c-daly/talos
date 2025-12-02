@@ -4,9 +4,9 @@ These tests combine multiple components (sensors, actuators, executor, telemetry
 to validate complete workflows with real services where available.
 """
 
-import os
 import pytest
 
+from talos.env import get_neo4j_config
 from talos.scenarios.pick_and_place import PickAndPlaceScenario
 from talos.executor import ExecutorShim, PlanNode, ActionType
 from talos.telemetry import EventType
@@ -21,11 +21,11 @@ def neo4j_available() -> bool:
     try:
         from neo4j import GraphDatabase
 
-        uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-        username = os.getenv("NEO4J_USERNAME", "neo4j")
-        password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
+        config = get_neo4j_config()
 
-        driver = GraphDatabase.driver(uri, auth=(username, password))
+        driver = GraphDatabase.driver(
+            config["uri"], auth=(config["user"], config["password"])
+        )
         with driver.session() as session:
             session.run("RETURN 1")
         driver.close()
@@ -94,11 +94,9 @@ def test_sensor_reading_to_planning_execution_loop(
 @pytest.mark.skipif(not neo4j_available(), reason="Neo4j not available")
 def test_executor_feedback_replanning_flow() -> None:
     """Test executor feedback → replanning flow."""
-    uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-    username = os.getenv("NEO4J_USERNAME", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
+    config = get_neo4j_config()
 
-    executor = ExecutorShim(uri, username, password)
+    executor = ExecutorShim(config["uri"], config["user"], config["password"])
     executor.clear_database()
 
     try:
@@ -247,13 +245,11 @@ def test_resource_cleanup_after_scenario(
 @pytest.mark.skipif(not neo4j_available(), reason="Neo4j not available")
 def test_complete_workflow_with_neo4j() -> None:
     """Test complete workflow with Neo4j integration."""
-    uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-    username = os.getenv("NEO4J_USERNAME", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "neo4jtest")
+    config = get_neo4j_config()
 
     # Create scenario and executor
     scenario = PickAndPlaceScenario()
-    executor = ExecutorShim(uri, username, password)
+    executor = ExecutorShim(config["uri"], config["user"], config["password"])
     executor.clear_database()
 
     try:
