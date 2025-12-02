@@ -127,9 +127,9 @@ def get_neo4j_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
     if env is None:
         env = load_stack_env()
     return {
-        "uri": get_env_value("NEO4J_URI", env, "bolt://localhost:7687"),
-        "user": get_env_value("NEO4J_USER", env, "neo4j"),
-        "password": get_env_value("NEO4J_PASSWORD", env, "neo4jtest"),
+        "uri": get_env_value("NEO4J_URI", env) or "bolt://localhost:7687",
+        "user": get_env_value("NEO4J_USER", env) or "neo4j",
+        "password": get_env_value("NEO4J_PASSWORD", env) or "neo4jtest",
     }
 
 
@@ -147,9 +147,8 @@ def get_milvus_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
     if env is None:
         env = load_stack_env()
     return {
-        "host": get_env_value("MILVUS_HOST", env, "localhost"),
-        "port": get_env_value("MILVUS_PORT", env, "19530"),
-        "healthcheck": get_env_value(
-            "MILVUS_HEALTHCHECK", env, "http://localhost:9091/healthz"
-        ),
+        "host": get_env_value("MILVUS_HOST", env) or "localhost",
+        "port": get_env_value("MILVUS_PORT", env) or "19530",
+        "healthcheck": get_env_value("MILVUS_HEALTHCHECK", env)
+        or "http://localhost:9091/healthz",
     }
