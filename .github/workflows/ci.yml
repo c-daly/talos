@@ -21,5 +21,4 @@ jobs:
       mypy_targets: 'src'
       pytest_command: 'pytest --cov=talos --cov-report=term-missing --cov-report=xml --cov-fail-under=95'
       coverage_python_version: '3.12'
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      upload_coverage: false

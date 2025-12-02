@@ -31,6 +31,7 @@ The helper:
 | `KEEP_STACK_RUNNING=1` | Leave services running after pytest completes. |
 | `RUN_TESTS=0` | Start the stack (and optionally keep it up) without invoking pytest. |
 | `PYTEST_BIN` | Override the pytest command (default `poetry run pytest`). |
+| `TALOS_REPO_ROOT` | Override automatic detection of the repository root (used by tests and scripts). |
 | `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` | Connection info passed to tests. |
 | `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`19530`). |
 
