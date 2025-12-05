@@ -24,7 +24,9 @@ def main() -> None:
     print(
         "Note: This example requires a running Neo4j instance at bolt://localhost:7687"
     )
-    print("For testing without Neo4j, see tests/scenarios/test_m4_executor_loop.py\n")
+    print(
+        "For testing without Neo4j, see tests/unit/scenarios/test_m4_executor_loop.py\n"
+    )
 
     # Create the executor shim
     # In a real scenario, replace these with your Neo4j credentials
@@ -102,7 +104,7 @@ def main() -> None:
             "\nMake sure Neo4j is running at bolt://localhost:7687 with the correct credentials."
         )
         print("Or run the tests to see the example with a mock Neo4j driver:")
-        print("  pytest tests/scenarios/test_m4_executor_loop.py -v")
+        print("  pytest tests/unit/scenarios/test_m4_executor_loop.py -v")
 
 
 if __name__ == "__main__":

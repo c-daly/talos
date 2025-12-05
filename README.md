@@ -239,7 +239,7 @@ with ExecutorShim(
     location = executor.get_robot_location()
 ```
 
-See `examples/executor_example.py` for a complete example and `tests/scenarios/test_m4_executor_loop.py` for tests using a mock Neo4j driver.
+See `examples/executor_example.py` for a complete example and `tests/unit/scenarios/test_m4_executor_loop.py` for tests using a mock Neo4j driver.
 
 ## Development
 

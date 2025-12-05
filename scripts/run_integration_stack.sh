@@ -11,11 +11,12 @@ DEFAULT_COMPOSE_FILE="$REPO_ROOT/tests/e2e/stack/talos/docker-compose.test.yml"
 COMPOSE_CMD=${COMPOSE_CMD:-"docker compose"}
 COMPOSE_FILE=${COMPOSE_FILE:-"$DEFAULT_COMPOSE_FILE"}
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-180}
+# Talos-specific offsets (Neo4j 57xxx, Milvus 59xxx) to avoid clashes with other repos
 PORTS_TO_CHECK=(
-  "47474:Neo4j HTTP"
-  "47687:Neo4j Bolt"
-  "49530:Milvus gRPC"
-  "49091:Milvus Metrics"
+  "57474:Neo4j HTTP"
+  "57687:Neo4j Bolt"
+  "57530:Milvus gRPC"
+  "57091:Milvus Metrics"
 )
 SERVICES=("neo4j" "milvus")
 KEEP_STACK_RUNNING=${KEEP_STACK_RUNNING:-0}

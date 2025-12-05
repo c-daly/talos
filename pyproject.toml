@@ -52,6 +52,8 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+plugins = ["pytest_asyncio"]
+pythonpath = ["src"]
 addopts = "-v --cov=talos --cov-report=term-missing"
 markers = [
     "integration: marks tests as integration tests requiring external services (Neo4j, Milvus)"

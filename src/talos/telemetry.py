@@ -2,8 +2,9 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
 from enum import Enum
+from threading import Lock
+from typing import Any, Dict, List, Optional
 
 
 class EventType(Enum):
@@ -55,6 +56,7 @@ class TelemetryRecorder:
         self.max_events = max_events
         self._events: List[TelemetryEvent] = []
         self._enabled = True
+        self._lock = Lock()
 
     def record_event(
         self,
@@ -69,21 +71,22 @@ class TelemetryRecorder:
             actuator_name: Name of the actuator
             data: Additional event data
         """
-        if not self._enabled:
-            return
+        with self._lock:
+            if not self._enabled:
+                return
 
-        event = TelemetryEvent(
-            timestamp=datetime.now(),
-            event_type=event_type,
-            actuator_name=actuator_name,
-            data=data or {},
-        )
+            event = TelemetryEvent(
+                timestamp=datetime.now(),
+                event_type=event_type,
+                actuator_name=actuator_name,
+                data=data or {},
+            )
 
-        self._events.append(event)
+            self._events.append(event)
 
-        # Maintain max size by removing oldest events
-        if len(self._events) > self.max_events:
-            self._events = self._events[-self.max_events :]
+            # Maintain max size by removing oldest events
+            if len(self._events) > self.max_events:
+                self._events = self._events[-self.max_events :]
 
     def get_events(
         self,
@@ -101,18 +104,19 @@ class TelemetryRecorder:
         Returns:
             List of telemetry events
         """
-        events = self._events
+        with self._lock:
+            events = self._events
 
-        if actuator_name:
-            events = [e for e in events if e.actuator_name == actuator_name]
+            if actuator_name:
+                events = [e for e in events if e.actuator_name == actuator_name]
 
-        if event_type:
-            events = [e for e in events if e.event_type == event_type]
+            if event_type:
+                events = [e for e in events if e.event_type == event_type]
 
-        if limit:
-            events = events[-limit:]
+            if limit:
+                events = events[-limit:]
 
-        return events
+            return list(events)
 
     def get_event_count(
         self,
@@ -132,15 +136,18 @@ class TelemetryRecorder:
 
     def clear(self) -> None:
         """Clear all recorded events."""
-        self._events = []
+        with self._lock:
+            self._events = []
 
     def enable(self) -> None:
         """Enable telemetry recording."""
-        self._enabled = True
+        with self._lock:
+            self._enabled = True
 
     def disable(self) -> None:
         """Disable telemetry recording."""
-        self._enabled = False
+        with self._lock:
+            self._enabled = False
 
     def is_enabled(self) -> bool:
         """Check if telemetry recording is enabled.
@@ -148,7 +155,8 @@ class TelemetryRecorder:
         Returns:
             True if enabled, False otherwise
         """
-        return self._enabled
+        with self._lock:
+            return self._enabled
 
     def to_dict(self) -> List[Dict[str, Any]]:
         """Export all events as dictionaries.
@@ -156,4 +164,5 @@ class TelemetryRecorder:
         Returns:
             List of event dictionaries
         """
-        return [event.to_dict() for event in self._events]
+        with self._lock:
+            return [event.to_dict() for event in self._events]
