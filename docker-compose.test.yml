@@ -1,0 +1,35 @@
+# Talos test stack - connects to Sophia API
+# All talos ports use 57xxx prefix (logos_config.TALOS_PORTS)
+#
+# Usage: docker compose -f docker-compose.test.yml up -d
+#
+# Note: Talos is the sensor/actuator layer and primarily needs Sophia.
+# It doesn't directly connect to Neo4j or Milvus - those are Sophia's backends.
+
+version: '3.9'
+
+networks:
+  default:
+    name: talos-test-network
+    driver: bridge
+
+services:
+  # Sophia API - Talos's primary dependency
+  sophia:
+    container_name: talos-test-sophia
+    image: ghcr.io/c-daly/sophia:latest
+    ports:
+      - "57001:8000"
+    environment:
+      - SOPHIA_API_TOKEN=test-token-for-talos
+      # Sophia would normally need Neo4j/Milvus, but for talos unit tests
+      # we can use mocked responses or a minimal sophia configuration
+      - SOPHIA_MODE=stub
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - default

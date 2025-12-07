@@ -502,4 +502,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+This project is not currently accepting external contributions.

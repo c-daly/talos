@@ -33,7 +33,22 @@ Key directories:
 
 ### Key documentation
 - `README.md` – Installation, architecture, features
-- `CONTRIBUTING.md` – PR process and coding standards
+
+### Shared configuration (`logos_config`)
+All LOGOS repos use the `logos_config` package from logos for consistent configuration:
+
+```python
+from logos_config import get_env_value, TALOS_PORTS
+
+# Talos uses port offset +50000
+ports = TALOS_PORTS
+print(ports.app)  # 58000
+
+# Environment helpers
+sophia_url = get_env_value("SOPHIA_API_URL", default="http://localhost:48000")
+```
+
+See `logos/logos_config/README.md` for full documentation.
 
 ---
 
