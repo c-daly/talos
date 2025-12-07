@@ -21,18 +21,18 @@ The test stack is **generated from LOGOS** using the `render-test-stacks` comman
 ### Services
 
 Talos requires:
-- **Neo4j** (ports 47474/47687) - Knowledge graph storage
-- **Milvus** (ports 49530/49091) - Vector similarity search
+- **Neo4j** (ports 57474/57687) - Knowledge graph storage
+- **Milvus** (ports 57530/57091) - Vector similarity search
 
 ### Port Allocation
 
-Talos uses the 47xxx/49xxx port range to avoid conflicts:
+Talos uses the 57xxx port range to avoid conflicts:
 | Service | Host Port | Container Port |
 |---------|-----------|----------------|
-| Neo4j HTTP | 47474 | 7474 |
-| Neo4j Bolt | 47687 | 7687 |
-| Milvus gRPC | 49530 | 19530 |
-| Milvus Health | 49091 | 9091 |
+| Neo4j HTTP | 57474 | 7474 |
+| Neo4j Bolt | 57687 | 7687 |
+| Milvus gRPC | 57530 | 19530 |
+| Milvus Health | 57091 | 9091 |
 
 ## Running Integration Tests
 
