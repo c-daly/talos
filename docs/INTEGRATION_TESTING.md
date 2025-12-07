@@ -13,13 +13,13 @@ The test stack files are located in `tests/e2e/stack/talos/`:
 
 ### Port Allocation
 
-Talos uses the 47xxx/49xxx port range to avoid conflicts:
+Talos uses the 57xxx port range to avoid conflicts:
 | Service | Host Port | Container Port |
 |---------|-----------|----------------|
-| Neo4j HTTP | 47474 | 7474 |
-| Neo4j Bolt | 47687 | 7687 |
-| Milvus gRPC | 49530 | 19530 |
-| Milvus Health | 49091 | 9091 |
+| Neo4j HTTP | 57474 | 7474 |
+| Neo4j Bolt | 57687 | 7687 |
+| Milvus gRPC | 57530 | 19530 |
+| Milvus Health | 57091 | 9091 |
 
 ## Recommended Workflow: `scripts/run_integration_stack.sh`
 
@@ -31,7 +31,7 @@ cd /home/fearsidhe/projects/LOGOS/talos
 
 The helper:
 
-1. Checks for port conflicts on 47474/47687/49530/49091 before starting services.
+1. Checks for port conflicts on 57474/57687/57530/57091 before starting services.
 2. Uses `docker compose ps -q` to locate the actual container IDs from
 	 `tests/e2e/stack/talos/docker-compose.test.yml` (override with `COMPOSE_FILE`).
 3. Polls health (Neo4j) or running state (Milvus) with log tailing on failure.
@@ -50,7 +50,7 @@ The helper:
 | `PYTEST_BIN` | Override the pytest command (default `poetry run pytest`). |
 | `TALOS_REPO_ROOT` | Override automatic detection of the repository root (used by tests and scripts). |
 | `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` | Connection info passed to tests. |
-| `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`49530`). |
+| `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`57530`). |
 
 Examples:
 
@@ -101,11 +101,11 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 - Default environment variables (from `tests/e2e/stack/talos/.env.test`):
 
 	```bash
-	export NEO4J_URI="bolt://localhost:47687"
+	export NEO4J_URI="bolt://localhost:57687"
 	export NEO4J_USERNAME="neo4j"
 	export NEO4J_PASSWORD="neo4jtest"
 	export MILVUS_HOST="localhost"
-	export MILVUS_PORT="49530"
+	export MILVUS_PORT="57530"
 	```
 
 - CI enforces **95%** coverage:
@@ -148,7 +148,7 @@ docker exec talos-test-neo4j cypher-shell -u neo4j -p neo4jtest "RETURN 1;"
 
 ```bash
 docker ps | grep milvus
-nc -zv localhost 49530
+nc -zv localhost 57530
 ```
 
 ### Clean Slate
