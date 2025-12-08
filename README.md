@@ -93,9 +93,9 @@ poetry run pytest --cov=talos --cov-report=term-missing --cov-fail-under=95
 
 ## Documentation
 
-- [LOGOS Getting Started](https://github.com/c-daly/logos/blob/main/docs/GETTING_STARTED.md)
-- [Architecture Overview](https://github.com/c-daly/logos/blob/main/docs/ARCHITECTURE.md)
-- [Testing Guide](https://github.com/c-daly/logos/blob/main/docs/TESTING.md)
+- [LOGOS Getting Started](https://github.com/c-daly/logos/blob/main/docs/guides/GETTING_STARTED.md)
+- [Architecture Overview](https://github.com/c-daly/logos/blob/main/docs/architecture/ARCHITECTURE.md)
+- [Testing Guide](https://github.com/c-daly/logos/blob/main/docs/guides/TESTING.md)
 
 ## License
 
