@@ -56,8 +56,8 @@ services:
     volumes:
     - talos_test_milvus:/var/lib/milvus
     ports:
-    - 69530:19530
-    - 59091:9091
+    - 57530:19530
+    - 57091:9091
     healthcheck:
       test:
       - CMD
