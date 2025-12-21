@@ -17,7 +17,7 @@ services:
   # Sophia API - Talos's primary dependency
   sophia:
     container_name: talos-test-sophia
-    image: ghcr.io/c-daly/sophia:latest
+    image: ghcr.io/c-daly/sophia:${SOPHIA_IMAGE_TAG:-latest}
     ports:
       - "57001:8000"
     environment:
