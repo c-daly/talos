@@ -14,6 +14,7 @@ import os
 from collections.abc import Mapping
 from functools import cache
 from pathlib import Path
+from typing import cast
 
 from logos_config.env import get_env_value as resolve_env_value
 from logos_config.env import get_repo_root as resolve_repo_root
@@ -88,7 +89,7 @@ def get_env_value(
     Returns:
         The resolved value or None if not found and no default.
     """
-    return resolve_env_value(key, env=env, default=default)
+    return cast(str | None, resolve_env_value(key, env=env, default=default))
 
 
 @cache
@@ -106,7 +107,7 @@ def get_repo_root(env: Mapping[str, str] | None = None) -> Path:
     Returns:
         Path to the repository root directory.
     """
-    return resolve_repo_root("talos", env=env)
+    return cast(Path, resolve_repo_root("talos", env=env))
 
 
 def get_neo4j_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
