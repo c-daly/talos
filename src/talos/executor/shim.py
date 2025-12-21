@@ -40,7 +40,7 @@ class ExecutorShim:
         """Initialize the executor shim.
 
         Args:
-            uri: Neo4j connection URI (e.g., 'bolt://localhost:7687')
+            uri: Neo4j connection URI (e.g., 'bolt://localhost:<TALOS_PORTS.neo4j_bolt>')
             username: Neo4j username
             password: Neo4j password
         """

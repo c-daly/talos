@@ -9,12 +9,15 @@ import pytest
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 
+from logos_config.ports import get_repo_ports
 from talos.env import get_neo4j_config
 from talos.executor import ExecutorShim, PlanNode, ActionType
 
 
 # Integration test marker
 pytestmark = pytest.mark.integration
+
+TALOS_PORTS = get_repo_ports("talos")
 
 
 def neo4j_available() -> bool:
@@ -205,7 +208,9 @@ def test_executor_concurrent_actions(executor: ExecutorShim) -> None:
 @pytest.mark.skipif(not neo4j_available(), reason="Neo4j not available")
 def test_executor_neo4j_connection_failure() -> None:
     """Test error handling when Neo4j connection fails."""
-    executor = ExecutorShim("bolt://invalid:7687", "neo4j", "password")
+    executor = ExecutorShim(
+        f"bolt://invalid:{TALOS_PORTS.neo4j_bolt}", "neo4j", "password"
+    )
     # Driver is lazy, so we need to actually attempt an operation to trigger connection
     with pytest.raises((ServiceUnavailable, Exception)):
         executor.get_robot_location()

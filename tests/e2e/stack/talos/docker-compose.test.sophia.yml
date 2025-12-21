@@ -1,7 +1,7 @@
 # Talos test stack - connects to Sophia API
 # All talos ports use 57xxx prefix (logos_config.TALOS_PORTS)
 #
-# Usage: docker compose -f docker-compose.test.yml up -d
+# Usage: docker compose -f docker-compose.test.sophia.yml up -d
 #
 # Note: Talos is the sensor/actuator layer and primarily needs Sophia.
 # It doesn't directly connect to Neo4j or Milvus - those are Sophia's backends.

@@ -4,6 +4,7 @@ from typing import Generator
 import uuid
 import numpy as np
 import pytest
+from logos_config.ports import get_repo_ports
 
 # Conditional imports for optional dependencies
 try:
@@ -24,6 +25,8 @@ except ImportError:
 # Integration test marker
 pytestmark = pytest.mark.integration
 
+TALOS_PORTS = get_repo_ports("talos")
+
 
 def milvus_available() -> bool:
     """Check if Milvus is available for testing."""
@@ -31,7 +34,9 @@ def milvus_available() -> bool:
         return False
 
     try:
-        connections.connect(host="localhost", port="19530", timeout=5)
+        connections.connect(
+            host="localhost", port=str(TALOS_PORTS.milvus_grpc), timeout=5
+        )
         connections.disconnect("default")
         return True
     except Exception:
@@ -44,7 +49,7 @@ def milvus_connection() -> Generator[None, None, None]:
     if not milvus_available():
         pytest.skip("Milvus not available")
 
-    connections.connect(host="localhost", port="19530")
+    connections.connect(host="localhost", port=str(TALOS_PORTS.milvus_grpc))
     yield
     connections.disconnect("default")
 
@@ -253,7 +258,9 @@ def test_error_handling_when_milvus_unavailable() -> None:
 
     # Try to connect to invalid host
     with pytest.raises(Exception):
-        connections.connect(host="invalid_host", port="19530", timeout=1)
+        connections.connect(
+            host="invalid_host", port=str(TALOS_PORTS.milvus_grpc), timeout=1
+        )
 
 
 @pytest.mark.skipif(not milvus_available(), reason="Milvus not available")

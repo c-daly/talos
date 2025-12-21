@@ -9,6 +9,8 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+from logos_config.ports import TALOS_PORTS
+
 from talos import env
 
 
@@ -134,7 +136,7 @@ class TestGetNeo4jConfig:
         """Has sensible defaults when no env configured."""
         config = env.get_neo4j_config(env={})
 
-        assert config["uri"] == "bolt://localhost:7687"
+        assert config["uri"] == f"bolt://localhost:{TALOS_PORTS.neo4j_bolt}"
         assert config["user"] == "neo4j"
         assert config["password"] == "neo4jtest"
 
@@ -157,8 +159,11 @@ class TestGetMilvusConfig:
         config = env.get_milvus_config(env={})
 
         assert config["host"] == "localhost"
-        assert config["port"] == "19530"
-        assert config["healthcheck"] == "http://localhost:9091/healthz"
+        assert config["port"] == str(TALOS_PORTS.milvus_grpc)
+        assert (
+            config["healthcheck"]
+            == f"http://localhost:{TALOS_PORTS.milvus_metrics}/healthz"
+        )
 
 
 class TestRepoRelocation:

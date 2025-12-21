@@ -24,11 +24,11 @@ poetry run python examples/sensor_example.py
 ```bash
 docker pull ghcr.io/c-daly/talos:latest
 docker run -p 8002:8002 \
-  -e NEO4J_URI=bolt://localhost:57687 \
+  -e NEO4J_URI=bolt://localhost:<TALOS_PORTS.neo4j_bolt> \
   -e NEO4J_USER=neo4j \
   -e NEO4J_PASSWORD=neo4jtest \
   -e MILVUS_HOST=localhost \
-  -e MILVUS_PORT=57530 \
+  -e MILVUS_PORT=<TALOS_PORTS.milvus_grpc> \
   ghcr.io/c-daly/talos:latest
 ```
 
@@ -72,10 +72,10 @@ scenario.run()
 ## Integration Tests
 
 ```bash
-./scripts/run_integration_stack.sh
+./scripts/run_tests.sh integration
 ```
 
-Uses port 57xxx range (Neo4j 57474/57687, Milvus 57530).
+Uses port 57xxx range (from `logos_config.TALOS_PORTS`).
 
 Environment overrides:
 - `REUSE_EXISTING_STACK=1` - Skip docker compose up

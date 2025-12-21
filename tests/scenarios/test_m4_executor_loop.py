@@ -10,8 +10,11 @@ import pytest
 import numpy as np
 import numpy.typing as npt
 
+from logos_config.ports import get_repo_ports
 from talos.executor import ExecutorShim, PlanNode, ActionType
 from talos.scenarios.pick_and_place import PickAndPlaceScenario
+
+TALOS_PORTS = get_repo_ports("talos")
 
 
 class MockNeo4jDriver:
@@ -200,7 +203,9 @@ def executor_shim(
     with patch(
         "talos.executor.shim.GraphDatabase.driver", return_value=mock_neo4j_driver
     ):
-        shim = ExecutorShim("bolt://localhost:7687", "neo4j", "password")
+        shim = ExecutorShim(
+            f"bolt://localhost:{TALOS_PORTS.neo4j_bolt}", "neo4j", "password"
+        )
         yield shim
         shim.close()
 
@@ -216,7 +221,9 @@ def test_executor_shim_context_manager(mock_neo4j_driver: MockNeo4jDriver) -> No
     with patch(
         "talos.executor.shim.GraphDatabase.driver", return_value=mock_neo4j_driver
     ):
-        with ExecutorShim("bolt://localhost:7687", "neo4j", "password") as shim:
+        with ExecutorShim(
+            f"bolt://localhost:{TALOS_PORTS.neo4j_bolt}", "neo4j", "password"
+        ) as shim:
             assert shim is not None
         assert mock_neo4j_driver.closed
 
@@ -431,7 +438,9 @@ def test_m4_invalid_action_type() -> None:
     """M4 Test: Handle invalid action type."""
     with patch("talos.executor.shim.GraphDatabase.driver") as mock_driver:
         mock_driver.return_value = MockNeo4jDriver()
-        shim = ExecutorShim("bolt://localhost:7687", "neo4j", "password")
+        shim = ExecutorShim(
+            f"bolt://localhost:{TALOS_PORTS.neo4j_bolt}", "neo4j", "password"
+        )
 
         # Create a plan node with an invalid action type by manipulating the object
         plan_node = PlanNode(
