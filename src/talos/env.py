@@ -14,6 +14,11 @@ import os
 from collections.abc import Mapping
 from functools import cache
 from pathlib import Path
+from typing import cast
+
+from logos_config.env import get_env_value as resolve_env_value
+from logos_config.env import get_repo_root as resolve_repo_root
+from logos_config.ports import get_repo_ports
 
 
 def _default_env_path() -> Path:
@@ -55,7 +60,12 @@ def load_stack_env(env_path: str | Path | None = None) -> dict[str, str]:
         if not line or line.startswith("#"):
             continue
         key, _, value = line.partition("=")
-        env[key.strip()] = value.strip()
+        value = value.strip()
+        if value.startswith('"') and value.endswith('"'):
+            value = value[1:-1]
+        elif value.startswith("'") and value.endswith("'"):
+            value = value[1:-1]
+        env[key.strip()] = value
     return env
 
 
@@ -79,11 +89,7 @@ def get_env_value(
     Returns:
         The resolved value or None if not found and no default.
     """
-    if key in os.environ:
-        return os.environ[key]
-    if env and key in env:
-        return env[key]
-    return default
+    return cast(str | None, resolve_env_value(key, env=env, default=default))
 
 
 @cache
@@ -101,21 +107,7 @@ def get_repo_root(env: Mapping[str, str] | None = None) -> Path:
     Returns:
         Path to the repository root directory.
     """
-    env_value = get_env_value("TALOS_REPO_ROOT", env)
-    if env_value:
-        candidate = Path(env_value).expanduser().resolve()
-        if candidate.exists():
-            return candidate
-
-    # GitHub Actions sets GITHUB_WORKSPACE to the repo checkout
-    github_workspace = os.getenv("GITHUB_WORKSPACE")
-    if github_workspace:
-        candidate = Path(github_workspace).resolve()
-        if candidate.exists():
-            return candidate
-
-    # Fallback: src/talos/env.py -> parents[2] = repo root
-    return Path(__file__).resolve().parents[2]
+    return cast(Path, resolve_repo_root("talos", env=env))
 
 
 def get_neo4j_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
@@ -131,10 +123,12 @@ def get_neo4j_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
     """
     if env is None:
         env = load_stack_env()
+    ports = get_repo_ports("talos", env)
+    default_uri = f"bolt://localhost:{ports.neo4j_bolt}"
     return {
-        "uri": get_env_value("NEO4J_URI", env) or "bolt://localhost:7687",
-        "user": get_env_value("NEO4J_USER", env) or "neo4j",
-        "password": get_env_value("NEO4J_PASSWORD", env) or "neo4jtest",
+        "uri": get_env_value("NEO4J_URI", env, default_uri) or default_uri,
+        "user": get_env_value("NEO4J_USER", env, "neo4j") or "neo4j",
+        "password": get_env_value("NEO4J_PASSWORD", env, "neo4jtest") or "neo4jtest",
     }
 
 
@@ -151,9 +145,12 @@ def get_milvus_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
     """
     if env is None:
         env = load_stack_env()
+    ports = get_repo_ports("talos", env)
+    default_health = f"http://localhost:{ports.milvus_metrics}/healthz"
     return {
-        "host": get_env_value("MILVUS_HOST", env) or "localhost",
-        "port": get_env_value("MILVUS_PORT", env) or "19530",
-        "healthcheck": get_env_value("MILVUS_HEALTHCHECK", env)
-        or "http://localhost:9091/healthz",
+        "host": get_env_value("MILVUS_HOST", env, "localhost") or "localhost",
+        "port": get_env_value("MILVUS_PORT", env, str(ports.milvus_grpc))
+        or str(ports.milvus_grpc),
+        "healthcheck": get_env_value("MILVUS_HEALTHCHECK", env, default_health)
+        or default_health,
     }

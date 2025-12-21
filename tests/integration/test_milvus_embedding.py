@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Optional
 import uuid
 import numpy as np
 import pytest
+from logos_config.ports import get_repo_ports
 
 # Conditional imports for optional dependencies
 try:
@@ -31,6 +32,8 @@ try:
     MILVUS_AVAILABLE = True
 except ImportError:
     MILVUS_AVAILABLE = False
+
+TALOS_PORTS = get_repo_ports("talos")
 
 
 class MockNeo4jDriver:
@@ -260,7 +263,9 @@ def test_milvus_health_check() -> None:
     """
     try:
         # Try to connect to Milvus
-        connections.connect(host="localhost", port="19530", timeout=5)
+        connections.connect(
+            host="localhost", port=str(TALOS_PORTS.milvus_grpc), timeout=5
+        )
 
         # Check if connection is healthy
         assert connections.has_connection("default")
@@ -284,7 +289,9 @@ def test_milvus_collection_initialization() -> None:
     collection_name = f"test_embeddings_{uuid.uuid4().hex[:8]}"
 
     try:
-        connections.connect(host="localhost", port="19530", timeout=5)
+        connections.connect(
+            host="localhost", port=str(TALOS_PORTS.milvus_grpc), timeout=5
+        )
 
         # Create collection
         collection = create_milvus_collection(collection_name, dim=128)
@@ -396,7 +403,9 @@ def test_milvus_embedding_integration_full(
 
     try:
         # Connect to Milvus
-        connections.connect(host="localhost", port="19530", timeout=5)
+        connections.connect(
+            host="localhost", port=str(TALOS_PORTS.milvus_grpc), timeout=5
+        )
 
         # Create collection
         collection = create_milvus_collection(collection_name, dim=128)
@@ -458,7 +467,9 @@ def test_milvus_collection_count_assertions(mock_neo4j_driver: MockNeo4jDriver) 
     collection_name = f"test_count_{uuid.uuid4().hex[:8]}"
 
     try:
-        connections.connect(host="localhost", port="19530", timeout=5)
+        connections.connect(
+            host="localhost", port=str(TALOS_PORTS.milvus_grpc), timeout=5
+        )
         collection = create_milvus_collection(collection_name, dim=128)
 
         sync_util = EmbeddingSyncUtility(

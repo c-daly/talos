@@ -11,7 +11,8 @@ tests/e2e/
     └── talos/
         ├── .env.test           # Environment variables for the stack
         ├── STACK_VERSION       # Git commit hash of logos that generated these files
-        └── docker-compose.test.yml  # Neo4j + Milvus test stack
+        ├── docker-compose.test.yml  # Neo4j + Milvus test stack
+        └── docker-compose.test.sophia.yml  # Optional Sophia stub service
 ```
 
 ## Stack Configuration
@@ -21,18 +22,19 @@ The test stack is **generated from LOGOS** using the `render-test-stacks` comman
 ### Services
 
 Talos requires:
-- **Neo4j** (ports 57474/57687) - Knowledge graph storage
-- **Milvus** (ports 57530/57091) - Vector similarity search
+- **Neo4j** (host ports from `TALOS_PORTS`) - Knowledge graph storage
+- **Milvus** (host ports from `TALOS_PORTS`) - Vector similarity search
 
 ### Port Allocation
 
-Talos uses the 57xxx port range to avoid conflicts:
-| Service | Host Port | Container Port |
-|---------|-----------|----------------|
-| Neo4j HTTP | 57474 | 7474 |
-| Neo4j Bolt | 57687 | 7687 |
-| Milvus gRPC | 57530 | 19530 |
-| Milvus Health | 57091 | 9091 |
+Talos uses the 57xxx port range to avoid conflicts; host values are sourced
+from `logos_config.TALOS_PORTS`.
+| Service | Host Port (from `logos_config`) | Container Port |
+|---------|----------------------------------|----------------|
+| Neo4j HTTP | `TALOS_PORTS.neo4j_http` | Neo4j default HTTP |
+| Neo4j Bolt | `TALOS_PORTS.neo4j_bolt` | Neo4j default Bolt |
+| Milvus gRPC | `TALOS_PORTS.milvus_grpc` | Milvus default gRPC |
+| Milvus Health | `TALOS_PORTS.milvus_metrics` | Milvus default health |
 
 ## Running Integration Tests
 

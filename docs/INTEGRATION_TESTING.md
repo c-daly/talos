@@ -8,18 +8,20 @@ across all repos.
 
 The test stack files are located in `tests/e2e/stack/talos/`:
 - `docker-compose.test.yml` - Neo4j + Milvus services
+- `docker-compose.test.sophia.yml` - Optional Sophia stub service
 - `.env.test` - Environment variables for the stack
 - `STACK_VERSION` - Git commit hash of logos that generated these files
 
 ### Port Allocation
 
-Talos uses the 57xxx port range to avoid conflicts:
-| Service | Host Port | Container Port |
-|---------|-----------|----------------|
-| Neo4j HTTP | 57474 | 7474 |
-| Neo4j Bolt | 57687 | 7687 |
-| Milvus gRPC | 57530 | 19530 |
-| Milvus Health | 57091 | 9091 |
+Talos uses the 57xxx port range to avoid conflicts; host values are sourced
+from `logos_config.TALOS_PORTS`.
+| Service | Host Port (from `logos_config`) | Container Port |
+|---------|----------------------------------|----------------|
+| Neo4j HTTP | `TALOS_PORTS.neo4j_http` | Neo4j default HTTP |
+| Neo4j Bolt | `TALOS_PORTS.neo4j_bolt` | Neo4j default Bolt |
+| Milvus gRPC | `TALOS_PORTS.milvus_grpc` | Milvus default gRPC |
+| Milvus Health | `TALOS_PORTS.milvus_metrics` | Milvus default health |
 
 ## Recommended Workflow: `scripts/run_integration_stack.sh`
 
@@ -29,9 +31,15 @@ cd /home/fearsidhe/projects/LOGOS/talos
 ./scripts/run_integration_stack.sh tests/integration/test_executor_neo4j.py -k grasp
 ```
 
+Alternative (standard runner):
+
+```bash
+./scripts/run_tests.sh integration
+```
+
 The helper:
 
-1. Checks for port conflicts on 57474/57687/57530/57091 before starting services.
+1. Checks for port conflicts using `TALOS_PORTS` values before starting services.
 2. Uses `docker compose ps -q` to locate the actual container IDs from
 	 `tests/e2e/stack/talos/docker-compose.test.yml` (override with `COMPOSE_FILE`).
 3. Polls health (Neo4j) or running state (Milvus) with log tailing on failure.
@@ -49,8 +57,8 @@ The helper:
 | `RUN_TESTS=0` | Start the stack (and optionally keep it up) without invoking pytest. |
 | `PYTEST_BIN` | Override the pytest command (default `poetry run pytest`). |
 | `TALOS_REPO_ROOT` | Override automatic detection of the repository root (used by tests and scripts). |
-| `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` | Connection info passed to tests. |
-| `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`57530`). |
+| `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` | Connection info passed to tests. |
+| `MILVUS_HOST`, `MILVUS_PORT` | Milvus connection info (defaults to `localhost`/`TALOS_PORTS.milvus_grpc`). |
 
 Examples:
 
@@ -76,8 +84,8 @@ docker compose -f infra/docker-compose.hcg.dev.yml ps
 ```
 
 Expected services:
-- `logos-hcg-neo4j` (ports 7474, 7687)
-- `logos-hcg-milvus` (ports 19530, 9091)
+- `logos-hcg-neo4j` (Neo4j default container ports)
+- `logos-hcg-milvus` (Milvus default container ports)
 
 Then, from the Talos repository:
 
@@ -101,11 +109,11 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 - Default environment variables (from `tests/e2e/stack/talos/.env.test`):
 
 	```bash
-	export NEO4J_URI="bolt://localhost:57687"
-	export NEO4J_USERNAME="neo4j"
+	export NEO4J_URI="bolt://localhost:<TALOS_PORTS.neo4j_bolt>"
+	export NEO4J_USER="neo4j"
 	export NEO4J_PASSWORD="neo4jtest"
 	export MILVUS_HOST="localhost"
-	export MILVUS_PORT="57530"
+	export MILVUS_PORT="<TALOS_PORTS.milvus_grpc>"
 	```
 
 - CI enforces **95%** coverage:
@@ -148,7 +156,7 @@ docker exec talos-test-neo4j cypher-shell -u neo4j -p neo4jtest "RETURN 1;"
 
 ```bash
 docker ps | grep milvus
-nc -zv localhost 57530
+nc -zv localhost <TALOS_PORTS.milvus_grpc>
 ```
 
 ### Clean Slate

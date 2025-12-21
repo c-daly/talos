@@ -11,12 +11,7 @@ DEFAULT_COMPOSE_FILE="$REPO_ROOT/tests/e2e/stack/talos/docker-compose.test.yml"
 COMPOSE_CMD=${COMPOSE_CMD:-"docker compose"}
 COMPOSE_FILE=${COMPOSE_FILE:-"$DEFAULT_COMPOSE_FILE"}
 HEALTH_TIMEOUT=${HEALTH_TIMEOUT:-180}
-PORTS_TO_CHECK=(
-  "57474:Neo4j HTTP"
-  "57687:Neo4j Bolt"
-  "57530:Milvus gRPC"
-  "57091:Milvus Metrics"
-)
+PORTS_TO_CHECK=()
 SERVICES=("neo4j" "milvus")
 KEEP_STACK_RUNNING=${KEEP_STACK_RUNNING:-0}
 REUSE_EXISTING_STACK=${REUSE_EXISTING_STACK:-0}
@@ -36,6 +31,26 @@ warn() {
 error() {
   echo "[error] $1" >&2
 }
+
+resolve_default_ports() {
+  python - <<'PY'
+from logos_config.ports import get_repo_ports
+
+ports = get_repo_ports("talos")
+print(f"NEO4J_HTTP_PORT_DEFAULT={ports.neo4j_http}")
+print(f"NEO4J_BOLT_PORT_DEFAULT={ports.neo4j_bolt}")
+print(f"MILVUS_PORT_DEFAULT={ports.milvus_grpc}")
+print(f"MILVUS_METRICS_PORT_DEFAULT={ports.milvus_metrics}")
+PY
+}
+
+eval "$(resolve_default_ports)"
+PORTS_TO_CHECK=(
+  "${NEO4J_HTTP_PORT_DEFAULT}:Neo4j HTTP"
+  "${NEO4J_BOLT_PORT_DEFAULT}:Neo4j Bolt"
+  "${MILVUS_PORT_DEFAULT}:Milvus gRPC"
+  "${MILVUS_METRICS_PORT_DEFAULT}:Milvus Metrics"
+)
 
 check_port_in_use() {
   local port=$1
@@ -173,11 +188,11 @@ for service in "${SERVICES[@]}"; do
   fi
 done
 
-export NEO4J_URI=${NEO4J_URI:-"bolt://localhost:7687"}
-export NEO4J_USERNAME=${NEO4J_USERNAME:-"neo4j"}
+export NEO4J_URI=${NEO4J_URI:-"bolt://localhost:${NEO4J_BOLT_PORT_DEFAULT}"}
+export NEO4J_USER=${NEO4J_USER:-"neo4j"}
 export NEO4J_PASSWORD=${NEO4J_PASSWORD:-"neo4jtest"}
 export MILVUS_HOST=${MILVUS_HOST:-"localhost"}
-export MILVUS_PORT=${MILVUS_PORT:-"19530"}
+export MILVUS_PORT=${MILVUS_PORT:-"${MILVUS_PORT_DEFAULT}"}
 
 if [[ "$RUN_TESTS" == "0" ]]; then
   info "RUN_TESTS=0 set; skipping pytest execution"
