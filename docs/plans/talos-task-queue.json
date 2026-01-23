@@ -1,0 +1,48 @@
+{
+  "queue_meta": {
+    "created": "2026-01-23",
+    "description": "Talos task queue with dependency graph for agent iteration",
+    "version": 1
+  },
+  "tasks": [
+    {
+      "id": "talos-35",
+      "repo": "talos",
+      "issue_number": 35,
+      "title": "Adopt config helper and logging from logos_test_utils",
+      "priority": "medium",
+      "type": "feature",
+      "group": "infrastructure",
+      "blockedBy": [],
+      "blocks": [],
+      "status": "pending",
+      "pr": null
+    },
+    {
+      "id": "talos-31",
+      "repo": "talos",
+      "issue_number": 31,
+      "title": "Test Assessment: Add coverage reporting and audit skip conditions",
+      "priority": "medium",
+      "type": "tech-debt",
+      "group": "testing",
+      "blockedBy": [],
+      "blocks": ["talos-28"],
+      "status": "pending",
+      "pr": null
+    },
+    {
+      "id": "talos-28",
+      "repo": "talos",
+      "issue_number": 28,
+      "title": "Improve test coverage",
+      "priority": "medium",
+      "type": "testing",
+      "group": "testing",
+      "blockedBy": ["talos-31"],
+      "blocks": [],
+      "status": "pending",
+      "pr": null
+    }
+  ]
+}
