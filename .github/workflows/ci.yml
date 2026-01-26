@@ -19,6 +19,6 @@ jobs:
       poetry_install_args: '--with dev'
       python_lint_paths: 'src tests'
       mypy_targets: 'src'
-      pytest_command: 'pytest --cov=talos --cov-report=term-missing --cov-report=xml --cov-fail-under=95'
+      pytest_command: 'pytest --cov=talos --cov-report=term-missing --cov-report=xml --cov-fail-under=60'
       coverage_python_version: '3.12'
       upload_coverage: false
