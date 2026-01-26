@@ -418,8 +418,8 @@ uvicorn = {version = "^0.32.0", extras = ["standard"]}
 [package.source]
 type = "git"
 url = "https://github.com/c-daly/logos.git"
-reference = "main"
-resolved_reference = "78a160dd30589d0fd3544cb2adc183fa0d113c8e"
+reference = "v0.2.0"
+resolved_reference = "849ddb4ed47c3911da305e175e4cec9c01ab5a0f"
 
 [[package]]
 name = "mypy"
@@ -1615,4 +1615,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "15014fc4667187823adb88d826f5e67146e45fdce2c193fa3780319756654d85"
+content-hash = "4573ae69397a208587292f100f6946f772ddec7c44acc333deb4fadd3d6f9fb5"

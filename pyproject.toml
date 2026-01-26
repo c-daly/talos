@@ -21,7 +21,8 @@ pydantic = "^2.0.0"
 numpy = "^1.24.0"
 neo4j = "^5.14.0"
 pymilvus = "^2.3.0"
-logos-foundry = { git = "https://github.com/c-daly/logos.git", branch = "main" }
+# Pinned to specific tag for stability
+logos-foundry = {git = "https://github.com/c-daly/logos.git", tag = "v0.2.0"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
@@ -49,7 +50,7 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
-module = ["logos_config", "logos_config.*"]
+module = ["logos_config", "logos_config.*", "logos_test_utils", "logos_test_utils.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
@@ -57,7 +58,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --cov=talos --cov-report=term-missing"
+addopts = "-v --cov=talos --cov-report=term-missing --cov-fail-under=60"
 markers = [
     "integration: marks tests as integration tests requiring external services (Neo4j, Milvus)"
 ]
