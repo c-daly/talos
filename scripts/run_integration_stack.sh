@@ -190,7 +190,7 @@ done
 
 export NEO4J_URI=${NEO4J_URI:-"bolt://localhost:${NEO4J_BOLT_PORT_DEFAULT}"}
 export NEO4J_USER=${NEO4J_USER:-"neo4j"}
-export NEO4J_PASSWORD=${NEO4J_PASSWORD:-"neo4jtest"}
+export NEO4J_PASSWORD=${NEO4J_PASSWORD:-"logosdev"}
 export MILVUS_HOST=${MILVUS_HOST:-"localhost"}
 export MILVUS_PORT=${MILVUS_PORT:-"${MILVUS_PORT_DEFAULT}"}
 

@@ -111,7 +111,7 @@ poetry run pytest tests/integration/test_e2e_scenario.py -v
 	```bash
 	export NEO4J_URI="bolt://localhost:<TALOS_PORTS.neo4j_bolt>"
 	export NEO4J_USER="neo4j"
-	export NEO4J_PASSWORD="neo4jtest"
+	export NEO4J_PASSWORD="logosdev"
 	export MILVUS_HOST="localhost"
 	export MILVUS_PORT="<TALOS_PORTS.milvus_grpc>"
 	```
@@ -149,7 +149,7 @@ The `STACK_VERSION` file contains the LOGOS commit hash used to generate the fil
 
 ```bash
 docker ps | grep neo4j
-docker exec talos-test-neo4j cypher-shell -u neo4j -p neo4jtest "RETURN 1;"
+docker exec talos-test-neo4j cypher-shell -u neo4j -p logosdev "RETURN 1;"
 ```
 
 ### Tests Skip: "Milvus not available"
