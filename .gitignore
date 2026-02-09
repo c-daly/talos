@@ -58,3 +58,4 @@ data/
 # Logs
 *.log
 logs/
+.claude/
