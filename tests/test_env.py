@@ -138,7 +138,7 @@ class TestGetNeo4jConfig:
 
         assert config["uri"] == f"bolt://localhost:{TALOS_PORTS.neo4j_bolt}"
         assert config["user"] == "neo4j"
-        assert config["password"] == "neo4jtest"
+        assert config["password"] == "logosdev"
 
 
 class TestGetMilvusConfig:

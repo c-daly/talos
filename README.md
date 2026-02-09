@@ -26,7 +26,7 @@ docker pull ghcr.io/c-daly/talos:latest
 docker run -p 8002:8002 \
   -e NEO4J_URI=bolt://localhost:<TALOS_PORTS.neo4j_bolt> \
   -e NEO4J_USER=neo4j \
-  -e NEO4J_PASSWORD=neo4jtest \
+  -e NEO4J_PASSWORD=logosdev \
   -e MILVUS_HOST=localhost \
   -e MILVUS_PORT=<TALOS_PORTS.milvus_grpc> \
   ghcr.io/c-daly/talos:latest

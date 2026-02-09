@@ -128,7 +128,7 @@ def get_neo4j_config(env: Mapping[str, str] | None = None) -> dict[str, str]:
     return {
         "uri": get_env_value("NEO4J_URI", env, default_uri) or default_uri,
         "user": get_env_value("NEO4J_USER", env, "neo4j") or "neo4j",
-        "password": get_env_value("NEO4J_PASSWORD", env, "neo4jtest") or "neo4jtest",
+        "password": get_env_value("NEO4J_PASSWORD", env, "logosdev") or "logosdev",
     }
 
 
