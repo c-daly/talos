@@ -401,7 +401,7 @@ files = [
 
 [[package]]
 name = "logos-foundry"
-version = "0.1.0"
+version = "0.4.0"
 description = "LOGOS Foundry - Canonical source of truth for Project LOGOS specifications, ontology, and infrastructure"
 optional = false
 python-versions = "^3.11"
@@ -418,8 +418,8 @@ uvicorn = {version = "^0.32.0", extras = ["standard"]}
 [package.source]
 type = "git"
 url = "https://github.com/c-daly/logos.git"
-reference = "v0.2.0"
-resolved_reference = "849ddb4ed47c3911da305e175e4cec9c01ab5a0f"
+reference = "v0.4.0"
+resolved_reference = "916d6424e3659ab8a5542567cf1317d4a2832317"
 
 [[package]]
 name = "mypy"
@@ -1060,6 +1060,25 @@ pluggy = ">=0.12,<2.0"
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "pytest-asyncio"
+version = "0.23.8"
+description = "Pytest support for asyncio"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "pytest_asyncio-0.23.8-py3-none-any.whl", hash = "sha256:50265d892689a5faefb84df80819d1ecef566eb3549cf915dfb33569359d1ce2"},
+    {file = "pytest_asyncio-0.23.8.tar.gz", hash = "sha256:759b10b33a6dc61cce40a8bd5205e302978bbbcc00e279a8b61d9a6a3c82e4d3"},
+]
+
+[package.dependencies]
+pytest = ">=7.0.0,<9"
+
+[package.extras]
+docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
+testing = ["coverage (>=6.2)", "hypothesis (>=5.7.1)"]
+
+[[package]]
 name = "pytest-cov"
 version = "4.1.0"
 description = "Pytest plugin for measuring coverage."
@@ -1615,4 +1634,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "4573ae69397a208587292f100f6946f772ddec7c44acc333deb4fadd3d6f9fb5"
+content-hash = "fbace58b0c74b61147e3289a9aae830c9dccc0744f1339d73232a187148f0b9a"

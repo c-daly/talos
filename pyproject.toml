@@ -22,10 +22,11 @@ numpy = "^1.24.0"
 neo4j = "^5.14.0"
 pymilvus = "^2.3.0"
 # Pinned to specific tag for stability
-logos-foundry = {git = "https://github.com/c-daly/logos.git", tag = "v0.2.0"}
+logos-foundry = {git = "https://github.com/c-daly/logos.git", tag = "v0.4.0"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
+pytest-asyncio = ">=0.21,<1.0"
 pytest-cov = "^4.0.0"
 black = "^23.0.0"
 ruff = "^0.1.0"
@@ -58,7 +59,11 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --cov=talos --cov-report=term-missing --cov-fail-under=60"
+addopts = "-v --cov=talos --cov-report=term-missing --cov-report=xml:coverage.xml --cov-fail-under=60"
+asyncio_mode = "auto"
 markers = [
-    "integration: marks tests as integration tests requiring external services (Neo4j, Milvus)"
+    "unit: fast tests with no external services",
+    "integration: tests requiring infrastructure services (Neo4j, Milvus)",
+    "e2e: end-to-end tests requiring full stack",
+    "slow: marks tests as slow",
 ]

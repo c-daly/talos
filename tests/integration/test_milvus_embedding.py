@@ -10,6 +10,13 @@ Phase 1: Small integration test covering:
 - Metadata/UUID verification in Neo4j
 - Health check and collection count assertions
 - Optional skip when Milvus is unavailable
+
+Skip conditions (talos#31):
+- Tests: @pytest.mark.skipif(not MILVUS_AVAILABLE, ...) — skips when pymilvus
+  cannot be imported. pymilvus is a declared dependency, so this should only
+  trigger in broken environments.
+- Runtime: pytest.skip() inside try/except blocks — catches connection errors
+  when Milvus service is unreachable. In CI, Milvus must be provided via Docker.
 """
 
 from typing import Any, Dict, List, Optional

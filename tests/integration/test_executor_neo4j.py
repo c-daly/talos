@@ -2,6 +2,13 @@
 
 These tests require a running Neo4j instance and are designed to skip gracefully
 when Neo4j is not available.
+
+Skip conditions (talos#31):
+- All tests: @pytest.mark.skipif(not neo4j_available(), ...) — skips when Neo4j
+  cannot be reached (connection refused or auth failure). In CI, Neo4j must be
+  provided via Docker service; tests run when service is healthy.
+- Fixture ``executor``: runtime pytest.skip() as a safety net for the same
+  condition, ensuring no test accidentally runs without a live database.
 """
 
 from typing import Generator
