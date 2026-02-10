@@ -7,9 +7,9 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$REPO_ROOT"
 echo "Running ruff..."
-ruff check .
+poetry run ruff check .
 
 echo "Running black..."
-black --check .
+poetry run black --check .
 
 echo "All checks passed."
