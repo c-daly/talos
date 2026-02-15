@@ -1,4 +1,11 @@
-"""Comprehensive Milvus integration tests for Talos."""
+"""Comprehensive Milvus integration tests for Talos.
+
+Skip conditions (talos#31):
+- All tests: @pytest.mark.skipif(not milvus_available(), ...) — skips when
+  pymilvus is not importable OR the Milvus gRPC endpoint is unreachable.
+  In CI, Milvus must be provided via Docker service.
+- Fixture ``milvus_connection``: runtime pytest.skip() as a safety net.
+"""
 
 from typing import Generator
 import uuid

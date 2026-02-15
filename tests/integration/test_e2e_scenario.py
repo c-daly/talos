@@ -2,6 +2,10 @@
 
 These tests combine multiple components (sensors, actuators, executor, telemetry)
 to validate complete workflows with real services where available.
+
+Skip conditions (talos#31):
+- All tests: @pytest.mark.skipif(not neo4j_available(), ...) — skips when Neo4j
+  cannot be reached. In CI, Neo4j must be provided via Docker service.
 """
 
 import pytest
