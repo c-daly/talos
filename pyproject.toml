@@ -16,13 +16,13 @@ classifiers = [
 packages = [{include = "talos", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 pydantic = "^2.0.0"
 numpy = "^1.24.0"
 neo4j = "^5.14.0"
 pymilvus = "^2.3.0"
 # Pinned to specific tag for stability
-logos-foundry = {git = "https://github.com/c-daly/logos.git", tag = "v0.4.1"}
+logos-foundry = {git = "https://github.com/c-daly/logos.git", tag = "v0.4.2"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
@@ -38,14 +38,14 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py312']
 
 [tool.ruff]
 line-length = 88
-target-version = "py311"
+target-version = "py312"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
