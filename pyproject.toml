@@ -10,7 +10,6 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 packages = [{include = "talos", from = "src"}]
@@ -18,7 +17,7 @@ packages = [{include = "talos", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.12"
 pydantic = "^2.0.0"
-numpy = "^1.24.0"
+numpy = "^1.26.0"
 neo4j = "^5.14.0"
 pymilvus = "^2.3.0"
 # Pinned to specific tag for stability
