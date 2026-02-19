@@ -1,5 +1,5 @@
 # Use logos-foundry as base image with all shared packages
-FROM ghcr.io/c-daly/logos-foundry:0.4.2
+FROM ghcr.io/c-daly/logos-foundry:0.5.0
 
 WORKDIR /app/talos
 
