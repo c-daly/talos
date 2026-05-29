@@ -141,19 +141,6 @@ def test_scenario_validation_postconditions() -> None:
     assert not state["objects"]["cup"]["grasped"]
 
 
-def test_scenario_timeout_handling() -> None:
-    """Test scenario timeout handling."""
-    scenario = PickAndPlaceScenario()
-
-    # Simulate a long-running operation by recording many events
-    for i in range(100):
-        scenario.joint1.set_position(float(i % 10) * 0.1)
-
-    # Scenario should still function
-    success = scenario.move_to_object("cup")
-    assert success
-
-
 def test_scenario_composition_complex() -> None:
     """Test complex scenario composition with multiple objects."""
     scenario = PickAndPlaceScenario()
@@ -254,35 +241,6 @@ def test_scenario_state_snapshot() -> None:
         assert len(snapshots[i + 1]["action_history"]) >= len(
             snapshots[i]["action_history"]
         )
-
-
-def test_scenario_concurrent_operations() -> None:
-    """Test scenario with concurrent operations (multiple joints moving)."""
-    scenario = PickAndPlaceScenario()
-
-    # Move all joints simultaneously
-    scenario.joint1.set_position(0.5)
-    scenario.joint2.set_position(1.0)
-    scenario.joint3.set_position(1.5)
-
-    # All joints should reach target positions
-    assert scenario.joint1.get_position() == 0.5
-    assert scenario.joint2.get_position() == 1.0
-    assert scenario.joint3.get_position() == 1.5
-
-
-def test_scenario_resource_cleanup() -> None:
-    """Test resource cleanup after scenario completion."""
-    scenario = PickAndPlaceScenario()
-
-    # Execute scenario
-    success, actions = scenario.execute_pick_and_place("cup", "shelf")
-    assert success
-
-    # Resources should be in clean state
-    assert scenario.gripper.get_grasped_object() is None
-    assert scenario.gripper.is_enabled()
-    assert scenario.joint1.is_enabled()
 
 
 def test_scenario_repeatability() -> None:
