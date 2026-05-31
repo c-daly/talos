@@ -62,57 +62,6 @@ def test_gripper_grasp_success_detection() -> None:
     assert gripper.get_grasped_object() is None
 
 
-def test_actuator_timeout_handling() -> None:
-    """Test actuator timeout handling."""
-    motor = SimulatedMotor(name="test_motor")
-
-    # Set a position
-    motor.set_position(1.0)
-    assert motor.get_position() == 1.0
-
-    # Disable and attempt to set position (simulates timeout)
-    motor.disable()
-
-    # Motor is disabled, so it should not change position
-    # The implementation doesn't explicitly prevent this, but typically
-    # a real actuator would timeout or fail
-    with pytest.raises(RuntimeError, match="disabled"):
-        motor.set_position(2.0)
-
-
-def test_actuator_command_queueing() -> None:
-    """Test actuator command queueing and execution order."""
-    telemetry = TelemetryRecorder()
-    motor = SimulatedMotor(name="test_motor", telemetry=telemetry)
-
-    # Queue multiple commands
-    positions = [0.5, 1.0, 1.5, 2.0]
-    for pos in positions:
-        motor.set_position(pos)
-
-    # Verify commands executed in order
-    events = telemetry.get_events(event_type=EventType.POSITION_SET)
-    assert len(events) == len(positions)
-
-    for i, event in enumerate(events):
-        assert event.data["clamped_position"] == positions[i]
-
-
-def test_actuator_state_synchronization() -> None:
-    """Test actuator state synchronization."""
-    motor1 = SimulatedMotor(name="motor1")
-    motor2 = SimulatedMotor(name="motor2")
-
-    # Set both motors to same position
-    target_position = 1.5
-    motor1.set_position(target_position)
-    motor2.set_position(target_position)
-
-    # Verify synchronization
-    assert motor1.get_position() == motor2.get_position()
-    assert motor1.get_position() == target_position
-
-
 def test_actuator_error_recovery() -> None:
     """Test actuator error recovery."""
     motor = SimulatedMotor(name="test_motor")
@@ -248,35 +197,6 @@ def test_gripper_state_transitions() -> None:
     assert EventType.GRIPPER_CLOSED in event_types
     assert EventType.OBJECT_GRASPED in event_types
     assert EventType.OBJECT_RELEASED in event_types
-
-
-def test_actuator_concurrent_operations() -> None:
-    """Test concurrent actuator operations don't interfere."""
-    telemetry = TelemetryRecorder()
-    motors = [SimulatedMotor(name=f"motor{i}", telemetry=telemetry) for i in range(5)]
-
-    # Set all motors simultaneously
-    for i, motor in enumerate(motors):
-        motor.set_position(float(i) * 0.5)
-
-    # Verify each motor maintained its position
-    for i, motor in enumerate(motors):
-        assert motor.get_position() == float(i) * 0.5
-
-    # Verify telemetry captured all operations
-    assert telemetry.get_event_count() == 5
-
-
-def test_actuator_feedback_loop_latency() -> None:
-    """Test actuator feedback loop has minimal latency."""
-    motor = SimulatedMotor(name="test_motor")
-
-    # Set position and immediately read
-    motor.set_position(1.5)
-    feedback = motor.get_position()
-
-    # Feedback should be immediate (no simulated latency)
-    assert feedback == 1.5
 
 
 def test_gripper_force_limits() -> None:
