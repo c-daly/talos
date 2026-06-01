@@ -21,7 +21,7 @@ numpy = ">=1.26.0,<2.4"
 neo4j = "^5.14.0"
 pymilvus = "^2.3.0"
 # Pinned to specific tag for stability
-logos-foundry = {git = "https://github.com/c-daly/logos.git", tag = "v0.5.0"}
+logos-foundry = {git = "https://github.com/c-daly/logos.git", tag = "v0.7.2"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"

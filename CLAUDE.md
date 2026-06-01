@@ -12,7 +12,7 @@ default ports.
 ## Dependencies
 
 - **Python** >=3.12, **Poetry** for dependency management
-- **logos-foundry** (v0.5.0) — shared config, HCG client, test utils
+- **logos-foundry** (v0.7.2) — shared config, HCG client, test utils
 - **Neo4j** (7474/7687) — used by `executor/shim.py` for plan-step state
 - **Milvus** (19530) — vector storage for sensor embedding tests
 - **numpy** — sensor data generation (images, depth maps, IMU readings)
