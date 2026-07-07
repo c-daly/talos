@@ -105,9 +105,18 @@ def validate_command(spec: EntitySpec, cmd: dict[str, Any]) -> None:
             act = spec.actuator(name)
         except KeyError:
             raise ValueError(f"unknown actuator: {name}")
-        (n,) = act.space.shape
-        if len(value) != n:
-            raise ValueError(f"{name}: shape expected {n}, got {len(value)}")
+        shape = act.space.shape
+        if len(shape) != 1:
+            raise ValueError(f"{name}: only rank-1 actuators supported, shape {shape}")
+        (n,) = shape
+        try:
+            vlen = len(value)
+        except TypeError:
+            raise ValueError(
+                f"{name}: expected a sequence of {n}, got {type(value).__name__}"
+            )
+        if vlen != n:
+            raise ValueError(f"{name}: shape expected {n}, got {vlen}")
         lo, hi = act.space.low, act.space.high
         for i, v in enumerate(value):
             if lo is not None and v < lo[i]:

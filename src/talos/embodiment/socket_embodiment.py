@@ -23,31 +23,34 @@ class SocketEmbodiment:
         self._sock = socket.create_connection((self._host, self._port), self._timeout)
         self._rf = self._sock.makefile("r", encoding="utf-8")
         manifest = json.loads(self._rf.readline())
-        assert manifest.get("type") == "manifest", "first line must be the manifest"
+        if manifest.get("type") != "manifest":
+            raise ValueError("first line must be the manifest")
         self._spec = EntitySpec.from_manifest(manifest)
         threading.Thread(target=self._reader, daemon=True).start()
 
     def _reader(self) -> None:
-        for line in self._rf:  # blocks per line; ends when socket closes
-            if self._stop.is_set():
-                break
-            line = line.strip()
-            if not line:
-                continue
-            msg = json.loads(line)
-            if msg.get("type") == "obs":
-                with self._lock:
-                    self._latest = StepResult(
-                        obs={
-                            k: v
-                            for k, v in msg.items()
-                            if k not in ("type", "sim_time")
-                        },
-                        sim_time=float(msg["sim_time"]),
-                    )
+        try:
+            for line in self._rf:  # blocks per line; ends when socket closes
+                if self._stop.is_set():
+                    break
+                line = line.strip()
+                if not line:
+                    continue
+                msg = json.loads(line)
+                if msg.get("type") == "obs" and self._spec is not None:
+                    obs = {
+                        s.name: msg[s.name] for s in self._spec.sensors if s.name in msg
+                    }
+                    with self._lock:
+                        self._latest = StepResult(
+                            obs=obs, sim_time=float(msg["sim_time"])
+                        )
+        except (OSError, ValueError):
+            pass  # socket closed / torn-down mid-read during close()
 
     def describe(self) -> EntitySpec:
-        assert self._spec is not None, "call connect() first"
+        if self._spec is None:
+            raise RuntimeError("call connect() first")
         return self._spec
 
     def read(self) -> StepResult:
@@ -55,7 +58,8 @@ class SocketEmbodiment:
             return self._latest
 
     def command(self, cmd: dict[str, Any]) -> None:
-        assert self._spec is not None and self._sock is not None, "call connect() first"
+        if self._spec is None or self._sock is None:
+            raise RuntimeError("call connect() first")
         validate_command(self._spec, cmd)
         payload = {"type": "cmd", "entity_id": self._spec.entity_id, **cmd}
         self._sock.sendall((json.dumps(payload) + "\n").encode("utf-8"))
@@ -63,4 +67,8 @@ class SocketEmbodiment:
     def close(self) -> None:
         self._stop.set()
         if self._sock is not None:
+            try:
+                self._sock.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
             self._sock.close()

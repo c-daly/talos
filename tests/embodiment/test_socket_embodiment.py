@@ -95,8 +95,10 @@ def test_describe_and_read():
         res = emb.read()
         assert res.sim_time == 1.0
         assert res.obs["odom"][3] == 0.5
+        assert "entity_id" not in res.obs
     finally:
         emb.close()
+        sim.srv.close()
 
 
 def test_command_validates_then_sends():
@@ -120,3 +122,46 @@ def test_command_validates_then_sends():
             pass
     finally:
         emb.close()
+        sim.srv.close()
+
+
+def test_obs_line_split_across_packets():
+    """A JSON obs message split across two TCP sends must still parse as one line."""
+    srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    srv.bind(("127.0.0.1", 0))
+    srv.listen(1)
+    port = srv.getsockname()[1]
+
+    obs_line = json.dumps(
+        {
+            "type": "obs",
+            "entity_id": "creature-0",
+            "sim_time": 1.0,
+            "odom": [0, 0, 0, 0.5, 0.2, 0.0],
+        }
+    )
+
+    def _serve():
+        conn, _ = srv.accept()
+        conn.sendall(MANIFEST_LINE.encode())
+        split = len(obs_line) // 2
+        conn.sendall(obs_line[:split].encode())
+        time.sleep(0.05)
+        conn.sendall((obs_line[split:] + "\n").encode())
+        while conn.recv(4096):
+            pass
+        conn.close()
+
+    threading.Thread(target=_serve, daemon=True).start()
+
+    emb = SocketEmbodiment("127.0.0.1", port)
+    emb.connect()
+    try:
+        deadline = time.time() + 2.0
+        while emb.read().sim_time == 0.0 and time.time() < deadline:
+            time.sleep(0.01)
+        assert emb.read().sim_time == 1.0
+    finally:
+        emb.close()
+        srv.close()
